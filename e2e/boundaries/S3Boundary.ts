@@ -2,6 +2,7 @@ import { DeleteObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client }
 
 export namespace S3Boundary {
   export const connectionDefaults = {
+    connectionFormat: "properties" as const,
     bucket: "bucko",
     region: "eu-central-1",
     endpoint: "http://s3:4566",

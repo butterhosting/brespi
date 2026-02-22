@@ -76,11 +76,11 @@ export namespace Step {
   };
 
   export type S3ConnectionProperties = {
-    bucket: string;
-    region?: string;
-    endpoint: string;
     accessKey: string;
     secretKey: string;
+    endpoint: string;
+    bucket: string;
+    region?: string;
   };
 
   export type PostgresqlConnection =

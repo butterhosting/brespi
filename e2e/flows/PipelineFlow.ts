@@ -46,6 +46,8 @@ export namespace PipelineFlow {
       })
     | (StepCommon & {
         type: "S3 Upload";
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         bucket?: string;
         baseFolder?: string;
         endpoint?: string;
@@ -57,6 +59,8 @@ export namespace PipelineFlow {
       })
     | (StepCommon & {
         type: "S3 Download";
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         bucket?: string;
         baseFolder?: string;
         endpoint?: string;
@@ -73,26 +77,30 @@ export namespace PipelineFlow {
       })
     | (StepCommon & {
         type: "PostgreSQL Backup";
-        connection?: string;
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         databaseSelectionStrategy?: "all" | "include" | "exclude";
         databaseSelectionInclusions?: string;
         databaseSelectionExclusions?: string;
       })
     | (StepCommon & {
         type: "PostgreSQL Restore";
-        connection?: string;
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         database?: string;
       })
     | (StepCommon & {
         type: "MariaDB Backup";
-        connection?: string;
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         databaseSelectionStrategy?: "all" | "include" | "exclude";
         databaseSelectionInclusions?: string;
         databaseSelectionExclusions?: string;
       })
     | (StepCommon & {
         type: "MariaDB Restore";
-        connection?: string;
+        connectionFormat?: "url" | "properties";
+        connectionUrl?: string;
         database?: string;
       });
 
@@ -306,23 +314,27 @@ export namespace PipelineFlow {
           return await findCurrentlyActiveStepId(page);
         }
         case "S3 Upload": {
-          if (step.bucket) await page.getByLabel("Bucket").fill(step.bucket);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
+          if (step.bucket) await page.getByLabel("Connection: bucket").fill(step.bucket);
           if (step.baseFolder) await page.getByLabel("Base prefix").fill(step.baseFolder);
-          if (step.endpoint) await page.getByLabel("Endpoint").fill(step.endpoint);
-          if (step.region) await page.getByLabel("Region").fill(step.region);
-          if (step.accessKey) await page.getByLabel("Access key").fill(step.accessKey);
-          if (step.secretKey) await page.getByLabel("Secret key").fill(step.secretKey);
+          if (step.endpoint) await page.getByLabel("Connection: endpoint").fill(step.endpoint);
+          if (step.region) await page.getByLabel("Connection: region").fill(step.region);
+          if (step.accessKey) await page.getByLabel("Connection: access key").fill(step.accessKey);
+          if (step.secretKey) await page.getByLabel("Connection: secret key").fill(step.secretKey);
           if (step.retention) await page.getByLabel("Retention policy").selectOption(step.retention);
           if (step.retentionMaxVersions) await page.getByLabel("Retention: max versions").fill(String(step.retentionMaxVersions));
           return await findCurrentlyActiveStepId(page);
         }
         case "S3 Download": {
-          if (step.bucket) await page.getByLabel("Bucket").fill(step.bucket);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
+          if (step.bucket) await page.getByLabel("Connection: bucket").fill(step.bucket);
           if (step.baseFolder) await page.getByLabel("Base prefix").fill(step.baseFolder);
-          if (step.endpoint) await page.getByLabel("Endpoint").fill(step.endpoint);
-          if (step.region) await page.getByLabel("Region").fill(step.region);
-          if (step.accessKey) await page.getByLabel("Access key").fill(step.accessKey);
-          if (step.secretKey) await page.getByLabel("Secret key").fill(step.secretKey);
+          if (step.endpoint) await page.getByLabel("Connection: endpoint").fill(step.endpoint);
+          if (step.region) await page.getByLabel("Connection: region").fill(step.region);
+          if (step.accessKey) await page.getByLabel("Connection: access key").fill(step.accessKey);
+          if (step.secretKey) await page.getByLabel("Connection: secret key").fill(step.secretKey);
           if (step.managedStorageSelectionTarget) {
             await page.getByLabel("Managed storage: target").selectOption(step.managedStorageSelectionTarget);
             if (step.managedStorageSelectionTarget === "specific" && step.managedStorageSelectionVersion) {
@@ -343,7 +355,8 @@ export namespace PipelineFlow {
           return await findCurrentlyActiveStepId(page);
         }
         case "PostgreSQL Backup": {
-          if (step.connection) await page.getByLabel("Connection").fill(step.connection);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
           if (step.databaseSelectionStrategy) {
             await page.getByLabel("Database selection method").selectOption(step.databaseSelectionStrategy);
             if (step.databaseSelectionStrategy === "include" && step.databaseSelectionInclusions) {
@@ -355,12 +368,14 @@ export namespace PipelineFlow {
           return await findCurrentlyActiveStepId(page);
         }
         case "PostgreSQL Restore": {
-          if (step.connection) await page.getByLabel("Connection").fill(step.connection);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
           if (step.database) await page.getByLabel("Database").fill(step.database);
           return await findCurrentlyActiveStepId(page);
         }
         case "MariaDB Backup": {
-          if (step.connection) await page.getByLabel("Connection").fill(step.connection);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
           if (step.databaseSelectionStrategy) {
             await page.getByLabel("Database selection method").selectOption(step.databaseSelectionStrategy);
             if (step.databaseSelectionStrategy === "include" && step.databaseSelectionInclusions) {
@@ -372,7 +387,8 @@ export namespace PipelineFlow {
           return await findCurrentlyActiveStepId(page);
         }
         case "MariaDB Restore": {
-          if (step.connection) await page.getByLabel("Connection").fill(step.connection);
+          if (step.connectionFormat) await page.getByLabel("Connection: format").selectOption(step.connectionFormat);
+          if (step.connectionUrl) await page.getByLabel("Connection: url").fill(step.connectionUrl);
           if (step.database) await page.getByLabel("Database").fill(step.database);
           return await findCurrentlyActiveStepId(page);
         }

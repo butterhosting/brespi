@@ -28,7 +28,7 @@ export class StepService {
   private getFieldValue(step: Step, dotPath: string): string | undefined {
     let current: any = step;
     for (const key of dotPath.split(".")) {
-      if (current == null) return undefined;
+      if (current === null || current === undefined) return undefined;
       current = current[key];
     }
     return typeof current === "string" ? current : undefined;

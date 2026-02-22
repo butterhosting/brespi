@@ -20,22 +20,6 @@ const { summary, Field, Label, Description } = FormHelper.meta({
         </>
       ),
     },
-    connection_properties_bucket: {
-      label: "Connection: bucket",
-      description: "Specifies the S3 bucket name to download from.",
-    },
-    basePrefix: {
-      label: "Base prefix",
-      description: 'Specifies the base S3 path prefix where artifacts are retrieved, and must point to a valid "managed storage root".',
-    },
-    connection_properties_region: {
-      label: "Connection: region",
-      description: "Specifies the region for the S3 bucket.",
-    },
-    connection_properties_endpoint: {
-      label: "Connection: endpoint",
-      description: "Specifies the S3 endpoint URL.",
-    },
     connection_properties_accessKey: {
       label: "Connection: access key",
       description: "Specifies the S3 access key.",
@@ -43,6 +27,26 @@ const { summary, Field, Label, Description } = FormHelper.meta({
     connection_properties_secretKey: {
       label: "Connection: secret key",
       description: "Specifies the S3 secret key.",
+    },
+    connection_properties_endpoint: {
+      label: "Connection: endpoint",
+      description: (
+        <>
+          Specifies the S3 endpoint URL, for example: <FormElements.Code break>https://s3.us-east-1.amazonaws.com</FormElements.Code>.
+        </>
+      ),
+    },
+    connection_properties_bucket: {
+      label: "Connection: bucket",
+      description: "Specifies the S3 bucket name to download from.",
+    },
+    connection_properties_region: {
+      label: "Connection: region",
+      description: "Specifies the region for the S3 bucket (optional).",
+    },
+    basePrefix: {
+      label: "Base prefix",
+      description: 'Specifies the base S3 path prefix where artifacts are retrieved, and must point to a valid "managed storage root".',
     },
     managedStorage: {
       label: "Use managed storage?",
@@ -82,12 +86,12 @@ const { summary, Field, Label, Description } = FormHelper.meta({
 type Form = {
   [Field.connection_format]: "url" | "properties";
   [Field.connection_url]: string;
-  [Field.connection_properties_bucket]: string;
-  [Field.basePrefix]: string;
-  [Field.connection_properties_region]: string;
-  [Field.connection_properties_endpoint]: string;
   [Field.connection_properties_accessKey]: string;
   [Field.connection_properties_secretKey]: string;
+  [Field.connection_properties_endpoint]: string;
+  [Field.connection_properties_bucket]: string;
+  [Field.connection_properties_region]: string;
+  [Field.basePrefix]: string;
   [Field.managedStorage]: "true";
   [Field.managedStorage_target]: "latest" | "specific";
   [Field.managedStorage_version]: string;
@@ -102,12 +106,12 @@ function defaultValues(existing: Step.S3Download | undefined): Form {
   return {
     [Field.connection_format]: existing?.connection.format ?? "url",
     [Field.connection_url]: existing?.connection.format === "url" ? existing.connection.url : "",
-    [Field.connection_properties_bucket]: props?.bucket ?? "",
-    [Field.basePrefix]: existing?.basePrefix ?? "",
-    [Field.connection_properties_region]: props?.region ?? "",
-    [Field.connection_properties_endpoint]: props?.endpoint ?? "",
     [Field.connection_properties_accessKey]: props?.accessKey ?? "",
     [Field.connection_properties_secretKey]: props?.secretKey ?? "",
+    [Field.connection_properties_endpoint]: props?.endpoint ?? "",
+    [Field.connection_properties_bucket]: props?.bucket ?? "",
+    [Field.connection_properties_region]: props?.region ?? "",
+    [Field.basePrefix]: existing?.basePrefix ?? "",
     [Field.managedStorage]: "true",
     [Field.managedStorage_target]: existing?.managedStorage.target ?? "latest",
     [Field.managedStorage_version]: existing?.managedStorage.target === "specific" ? existing.managedStorage.version : "",
@@ -205,7 +209,7 @@ export function S3DownloadForm({ id, existing, onSave, onDelete, onCancel, class
           {connectionFormat === "properties" && (
             <>
               <FormElements.LabeledInput
-                field={Field.connection_properties_bucket}
+                field={Field.connection_properties_accessKey}
                 labels={Label}
                 register={form.register}
                 activeField={activeField}
@@ -213,7 +217,7 @@ export function S3DownloadForm({ id, existing, onSave, onDelete, onCancel, class
                 input={{ type: "text" }}
               />
               <FormElements.LabeledInput
-                field={Field.connection_properties_region}
+                field={Field.connection_properties_secretKey}
                 labels={Label}
                 register={form.register}
                 activeField={activeField}
@@ -229,7 +233,7 @@ export function S3DownloadForm({ id, existing, onSave, onDelete, onCancel, class
                 input={{ type: "text" }}
               />
               <FormElements.LabeledInput
-                field={Field.connection_properties_accessKey}
+                field={Field.connection_properties_bucket}
                 labels={Label}
                 register={form.register}
                 activeField={activeField}
@@ -237,7 +241,7 @@ export function S3DownloadForm({ id, existing, onSave, onDelete, onCancel, class
                 input={{ type: "text" }}
               />
               <FormElements.LabeledInput
-                field={Field.connection_properties_secretKey}
+                field={Field.connection_properties_region}
                 labels={Label}
                 register={form.register}
                 activeField={activeField}

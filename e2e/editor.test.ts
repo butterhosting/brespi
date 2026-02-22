@@ -16,7 +16,7 @@ test("creates and deletes a simple backup pipeline", async ({ page }) => {
       {
         id: "A",
         type: "PostgreSQL Backup",
-        connection: "${MY_POSTGRESQL_URL}",
+        connectionUrl: "${MY_POSTGRESQL_URL}",
       },
       {
         previousId: "A",
@@ -141,12 +141,12 @@ test("relation links can be deleted when a step form is open", async ({ page }) 
 
 test("sensitive fields show warnings for plaintext values", async ({ page }) => {
   const expectedSensitiveFields: Record<string, string[]> = {
-    "PostgreSQL Backup": ["Connection"],
-    "PostgreSQL Restore": ["Connection"],
-    "MariaDB Backup": ["Connection"],
-    "MariaDB Restore": ["Connection"],
-    "S3 Download": ["Secret key"],
-    "S3 Upload": ["Secret key"],
+    "PostgreSQL Backup": ["Connection: url"],
+    "PostgreSQL Restore": ["Connection: url"],
+    "MariaDB Backup": ["Connection: url"],
+    "MariaDB Restore": ["Connection: url"],
+    "S3 Download": ["Connection: url"],
+    "S3 Upload": ["Connection: url"],
     Encryption: ["Key"],
     Decryption: ["Key"],
   };
