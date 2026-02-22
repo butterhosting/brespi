@@ -4,7 +4,6 @@ import { Env } from "@/Env";
 import { Artifact } from "@/models/Artifact";
 import { Step } from "@/models/Step";
 import { StepWithRuntime } from "@/models/StepWithRuntime";
-import { S3Client } from "bun";
 import { isAbsolute, join, relative } from "path";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
@@ -92,7 +91,7 @@ export class S3Adapter extends AbstractAdapter {
     const artifacts: Artifact[] = [];
     for (const { name, path } of selectableArtifacts) {
       const { outputId, outputPath } = this.generateArtifactDestination();
-      await Bun.write(outputPath, client.file(path));
+      await Bun.write(outputPath, await client.file(path).arrayBuffer());
       artifacts.push({
         id: outputId,
         type: "file",
@@ -140,7 +139,7 @@ export class S3Adapter extends AbstractAdapter {
     });
   }
 
-  private createReadWriteFns(client: S3Client): ManagedStorageCapability.ReadWriteFns {
+  private createReadWriteFns(client: BrespiS3Client): ManagedStorageCapability.ReadWriteFns {
     return {
       writeFn: async (item: { path: string; content: string }) => {
         await client.write(item.path, item.content).catch((cause) => {

@@ -1,11 +1,16 @@
-import { S3Client as BunS3Client } from "bun";
-import { S3Client as AWSS3Client, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client as AWSS3Client,
+  DeleteObjectsCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
 
-export class BrespiS3Client extends BunS3Client {
+export class BrespiS3Client {
   private readonly awsClient: AWSS3Client;
 
   public constructor(public readonly options: Bun.S3Options) {
-    super(options);
     this.awsClient = new AWSS3Client({
       endpoint: options.endpoint,
       region: options.region,
@@ -15,6 +20,40 @@ export class BrespiS3Client extends BunS3Client {
       },
       forcePathStyle: true,
     });
+  }
+
+  public file(path: string): BrespiS3Client.FileRef {
+    return new BrespiS3Client.FileRef(this.awsClient, this.options.bucket!, path);
+  }
+
+  public async write(path: string, content: string | Blob): Promise<void> {
+    const body = content instanceof Blob ? Buffer.from(await content.arrayBuffer()) : content;
+    await this.awsClient.send(
+      new PutObjectCommand({
+        Bucket: this.options.bucket,
+        Key: path,
+        Body: body,
+      }),
+    );
+  }
+
+  public async list(options: {
+    prefix?: string;
+    maxKeys?: number;
+    startAfter?: string;
+  }): Promise<{ contents: Array<{ key: string }>; isTruncated: boolean }> {
+    const result = await this.awsClient.send(
+      new ListObjectsV2Command({
+        Bucket: this.options.bucket,
+        Prefix: options.prefix,
+        MaxKeys: options.maxKeys,
+        StartAfter: options.startAfter,
+      }),
+    );
+    return {
+      contents: (result.Contents || []).map((item) => ({ key: item.Key! })),
+      isTruncated: result.IsTruncated ?? false,
+    };
   }
 
   public async listAllKeys({ prefix }: { prefix?: string } = {}) {
@@ -57,7 +96,6 @@ export class BrespiS3Client extends BunS3Client {
       if (batch.length === 0) {
         break;
       }
-      // Using the AWS client here, because Bun's client doesn't support multi-delete (yet)
       const result = await this.awsClient.send(
         new DeleteObjectsCommand({
           Bucket: this.options.bucket,
@@ -84,6 +122,51 @@ export class BrespiS3Client extends BunS3Client {
         errors: errors.slice(0, 10),
       };
       throw new Error(`S3 batch deletion (partially) failed; ${JSON.stringify(details, null, 2)}`);
+    }
+  }
+}
+
+export namespace BrespiS3Client {
+  export class FileRef {
+    constructor(
+      private readonly awsClient: AWSS3Client,
+      private readonly bucket: string,
+      private readonly key: string,
+    ) {}
+
+    async exists(): Promise<boolean> {
+      try {
+        await this.awsClient.send(
+          new HeadObjectCommand({
+            Bucket: this.bucket,
+            Key: this.key,
+          }),
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async text(): Promise<string> {
+      const result = await this.awsClient.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: this.key,
+        }),
+      );
+      return await result.Body!.transformToString();
+    }
+
+    async arrayBuffer(): Promise<ArrayBuffer> {
+      const result = await this.awsClient.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: this.key,
+        }),
+      );
+      const bytes = await result.Body!.transformToByteArray();
+      return bytes.buffer as ArrayBuffer;
     }
   }
 }
