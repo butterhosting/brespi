@@ -403,6 +403,26 @@ describe("UrlParser", () => {
           bucket: "my-bucket",
         },
       },
+      {
+        url: "s3://mykey:mysecret@s3.eu-central-1.amazonaws.com/jessyworld-test",
+        expectation: {
+          accessKey: "mykey",
+          secretKey: "mysecret",
+          endpoint: "https://s3.eu-central-1.amazonaws.com",
+          bucket: "jessyworld-test",
+          region: "eu-central-1",
+        },
+      },
+      {
+        url: "s3://mykey:mysecret@s3.ap-southeast-1.amazonaws.com/my-bucket?region=us-west-2",
+        expectation: {
+          accessKey: "mykey",
+          secretKey: "mysecret",
+          endpoint: "https://s3.ap-southeast-1.amazonaws.com",
+          bucket: "my-bucket",
+          region: "us-west-2",
+        },
+      },
     ];
     for (const { url, expectation } of successCases) {
       it(url, async () => {

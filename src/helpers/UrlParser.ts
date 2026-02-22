@@ -50,7 +50,7 @@ export namespace UrlParser {
       if (!bucket) {
         throw new Error("Bucket is required in connection URL (as path, e.g. s3://key:secret@host/bucket)");
       }
-      const region = parsedUrl.searchParams.get("region") || undefined;
+      const region = parsedUrl.searchParams.get("region") || inferAwsRegion(host) || undefined;
       return { accessKey, secretKey, endpoint, bucket, region };
     } catch (error) {
       if (error instanceof TypeError) {
@@ -58,6 +58,15 @@ export namespace UrlParser {
       }
       throw error;
     }
+  }
+
+  /**
+   * Extracts the region from an AWS S3 hostname like `s3.eu-central-1.amazonaws.com`.
+   * Returns null for non-matching hosts (e.g. MinIO, custom endpoints).
+   */
+  function inferAwsRegion(host: string): string | null {
+    const match = host.match(/^s3\.([a-z0-9-]+)\.amazonaws\.com$/);
+    return match?.[1] ?? null;
   }
 
   function parseDatabaseUrl(url: string, allowedProtocols: string[]): Step.DatabaseConnectionProperties {
