@@ -21,7 +21,7 @@ export class PostgresqlAdapter extends AbstractAdapter {
   }
 
   public async backup(step: Step.PostgresqlBackup): Promise<AdapterResult> {
-    const { username, password, host, port } = UrlParser.postgresql(this.resolveString(step.connection));
+    const { user, password, host, port } = this.resolveConnection(step.connection);
     const { toolkit } = step;
     const tempDir = await this.createTmpDestination();
     try {
@@ -30,7 +30,7 @@ export class PostgresqlAdapter extends AbstractAdapter {
         cmd: ["bash", scriptPath],
         env: {
           ...process.env,
-          PGUSER: username,
+          PGUSER: user,
           PGPASSWORD: password,
           PGHOST: host,
           PGPORT: port,
@@ -95,14 +95,14 @@ export class PostgresqlAdapter extends AbstractAdapter {
     this.requireArtifactSize(artifacts, { min: 1, max: 1 });
     const artifact = artifacts[0];
     this.requireArtifactType("file", artifact);
-    const { username, password, host, port } = UrlParser.postgresql(this.resolveString(step.connection));
+    const { user, password, host, port } = this.resolveConnection(step.connection);
     const { toolkit } = step;
     try {
       const { stdout } = await this.runCommand({
         cmd: ["bash", join(import.meta.dir, "pg_restore.sh")],
         env: {
           ...process.env,
-          PGUSER: username,
+          PGUSER: user,
           PGPASSWORD: password,
           PGHOST: host,
           PGPORT: port,
@@ -137,6 +137,18 @@ export class PostgresqlAdapter extends AbstractAdapter {
     } catch (e) {
       throw this.mapError(e, ExecutionError.postgresql_restore_failed);
     }
+  }
+
+  private resolveConnection(connection: Step.PostgresqlConnection): Step.DatabaseConnectionProperties {
+    if (connection.format === "url") {
+      return UrlParser.postgresql(this.resolveString(connection.url));
+    }
+    return {
+      user: this.resolveString(connection.properties.user),
+      password: this.resolveString(connection.properties.password),
+      host: this.resolveString(connection.properties.host),
+      port: connection.properties.port ? this.resolveString(connection.properties.port) : undefined,
+    };
   }
 }
 

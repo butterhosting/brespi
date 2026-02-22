@@ -28,7 +28,7 @@
           "previousId": "43n7g1",
           "object": "step",
           "type": "mariadb_restore",
-          "connection": "${MARIA_STAGING_CONNECTION}",
+          "connection": { "format": "url", "url": "${MARIA_STAGING_CONNECTION}" },
           "toolkit": {
             "resolution": "automatic"
           },

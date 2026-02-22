@@ -107,13 +107,16 @@ export namespace StepDetails {
       }
       case Step.Type.s3_upload: {
         const F = S3UploadForm.Field;
+        const s3Props = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(S3UploadForm.Label, {
-          [F.connection_bucket]: step.connection.bucket,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_bucket]: s3Props?.bucket,
           [F.basePrefix]: step.basePrefix,
-          [F.connection_region]: step.connection.region,
-          [F.connection_endpoint]: step.connection.endpoint,
-          [F.connection_accessKey]: step.connection.accessKey,
-          [F.connection_secretKey]: step.connection.secretKey,
+          [F.connection_properties_region]: s3Props?.region,
+          [F.connection_properties_endpoint]: s3Props?.endpoint,
+          [F.connection_properties_accessKey]: s3Props?.accessKey,
+          [F.connection_properties_secretKey]: s3Props?.secretKey,
           [F.managedStorage]: true,
           [F.retentionPolicy]: step.retention ? step.retention.policy : "none",
           [F.retentionMaxVersions]: step.retention?.policy === "last_n_versions" ? step.retention.maxVersions : undefined,
@@ -121,13 +124,16 @@ export namespace StepDetails {
       }
       case Step.Type.s3_download: {
         const F = S3DownloadForm.Field;
+        const s3Props = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(S3DownloadForm.Label, {
-          [F.connection_bucket]: step.connection.bucket,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_bucket]: s3Props?.bucket,
           [F.basePrefix]: step.basePrefix,
-          [F.connection_region]: step.connection.region,
-          [F.connection_endpoint]: step.connection.endpoint,
-          [F.connection_accessKey]: step.connection.accessKey,
-          [F.connection_secretKey]: step.connection.secretKey,
+          [F.connection_properties_region]: s3Props?.region,
+          [F.connection_properties_endpoint]: s3Props?.endpoint,
+          [F.connection_properties_accessKey]: s3Props?.accessKey,
+          [F.connection_properties_secretKey]: s3Props?.secretKey,
           [F.managedStorage]: true,
           [F.managedStorage_target]: step.managedStorage.target,
           [F.managedStorage_version]: step.managedStorage.target === "specific" ? step.managedStorage.version : undefined,
@@ -140,8 +146,14 @@ export namespace StepDetails {
       }
       case Step.Type.postgresql_backup: {
         const F = PostgresqlBackupForm.Field;
+        const dbProps = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(PostgresqlBackupForm.Label, {
-          [F.connection]: step.connection,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_user]: dbProps?.user,
+          [F.connection_properties_password]: dbProps?.password,
+          [F.connection_properties_host]: dbProps?.host,
+          [F.connection_properties_port]: dbProps?.port,
           [F.toolkit_resolution]: step.toolkit.resolution,
           [F.toolkit_psql]: step.toolkit.resolution === "manual" ? step.toolkit.psql : undefined,
           [F.toolkit_pg_dump]: step.toolkit.resolution === "manual" ? step.toolkit.pg_dump : undefined,
@@ -152,8 +164,14 @@ export namespace StepDetails {
       }
       case Step.Type.postgresql_restore: {
         const F = PostgresqlRestoreForm.Field;
+        const dbProps = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(PostgresqlRestoreForm.Label, {
-          [F.connection]: step.connection,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_user]: dbProps?.user,
+          [F.connection_properties_password]: dbProps?.password,
+          [F.connection_properties_host]: dbProps?.host,
+          [F.connection_properties_port]: dbProps?.port,
           [F.toolkit_resolution]: step.toolkit.resolution,
           [F.toolkit_psql]: step.toolkit.resolution === "manual" ? step.toolkit.psql : undefined,
           [F.toolkit_pg_restore]: step.toolkit.resolution === "manual" ? step.toolkit.pg_restore : undefined,
@@ -162,8 +180,14 @@ export namespace StepDetails {
       }
       case Step.Type.mariadb_backup: {
         const F = MariadbBackupForm.Field;
+        const dbProps = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(MariadbBackupForm.Label, {
-          [F.connection]: step.connection,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_user]: dbProps?.user,
+          [F.connection_properties_password]: dbProps?.password,
+          [F.connection_properties_host]: dbProps?.host,
+          [F.connection_properties_port]: dbProps?.port,
           [F.toolkit_resolution]: step.toolkit.resolution,
           [F.toolkit_mariadb]: step.toolkit.resolution === "manual" ? step.toolkit.mariadb : undefined,
           [F.toolkit_mariadb_dump]: step.toolkit.resolution === "manual" ? step.toolkit["mariadb-dump"] : undefined,
@@ -174,8 +198,14 @@ export namespace StepDetails {
       }
       case Step.Type.mariadb_restore: {
         const F = MariadbRestoreForm.Field;
+        const dbProps = step.connection.format === "properties" ? step.connection.properties : undefined;
         return performLabeling<typeof F>(MariadbRestoreForm.Label, {
-          [F.connection]: step.connection,
+          [F.connection_format]: step.connection.format,
+          [F.connection_url]: step.connection.format === "url" ? step.connection.url : undefined,
+          [F.connection_properties_user]: dbProps?.user,
+          [F.connection_properties_password]: dbProps?.password,
+          [F.connection_properties_host]: dbProps?.host,
+          [F.connection_properties_port]: dbProps?.port,
           [F.toolkit_resolution]: step.toolkit.resolution,
           [F.toolkit_mariadb]: step.toolkit.resolution === "manual" ? step.toolkit.mariadb : undefined,
           [F.database]: step.database,

@@ -9,7 +9,7 @@
           "id": "6ypcop",
           "object": "step",
           "type": "postgresql_backup",
-          "connection": "${PG_PROD_CONNECTION}",
+          "connection": { "format": "url", "url": "${PG_PROD_CONNECTION}" },
           "toolkit": {
             "resolution": "manual",
             "psql": "/usr/local/bin/psql",
@@ -35,10 +35,13 @@
           "object": "step",
           "type": "s3_upload",
           "connection": {
-            "bucket": "db-backups",
-            "endpoint": "https://minio.internal:9000",
-            "accessKey": "${MINIO_ACCESS_KEY}",
-            "secretKey": "${MINIO_SECRET_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "db-backups",
+              "endpoint": "https://minio.internal:9000",
+              "accessKey": "${MINIO_ACCESS_KEY}",
+              "secretKey": "${MINIO_SECRET_KEY}"
+            }
           },
           "basePrefix": "postgresql",
           "retention": {
@@ -57,7 +60,7 @@
           "id": "8awlc7",
           "object": "step",
           "type": "mariadb_backup",
-          "connection": "${MARIA_PROD_CONNECTION}",
+          "connection": { "format": "url", "url": "${MARIA_PROD_CONNECTION}" },
           "toolkit": {
             "resolution": "automatic"
           },
@@ -81,10 +84,13 @@
           "object": "step",
           "type": "s3_upload",
           "connection": {
-            "bucket": "db-backups",
-            "endpoint": "https://minio.internal:9000",
-            "accessKey": "${MINIO_ACCESS_KEY}",
-            "secretKey": "${MINIO_SECRET_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "db-backups",
+              "endpoint": "https://minio.internal:9000",
+              "accessKey": "${MINIO_ACCESS_KEY}",
+              "secretKey": "${MINIO_SECRET_KEY}"
+            }
           },
           "basePrefix": "mariadb",
           "retention": {

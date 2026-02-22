@@ -33,14 +33,17 @@ describe(StepService.name, () => {
       object: "step",
       type: Step.Type.s3_upload,
       connection: {
-        bucket: "my-bucket",
-        endpoint: "https://s3.example.com",
-        accessKey: "AKIAIOSFODNN7EXAMPLE",
-        secretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        format: "properties",
+        properties: {
+          bucket: "my-bucket",
+          endpoint: "https://s3.example.com",
+          accessKey: "AKIAIOSFODNN7EXAMPLE",
+          secretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        },
       },
       basePrefix: "backups/",
     };
-    expect(service.validate(step)).toEqual({ fields: ["connection.secretKey"] });
+    expect(service.validate(step)).toEqual({ fields: ["connection.properties.secretKey"] });
   });
 
   it("returns empty fields for step types without reference fields", () => {

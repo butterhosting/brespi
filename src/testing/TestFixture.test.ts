@@ -186,10 +186,13 @@ export namespace TestFixture {
         const step: Step.S3Upload = {
           type: Step.Type.s3_upload,
           connection: {
-            bucket: "bucko",
-            endpoint: "http://s3:4566",
-            accessKey: "${MY_S3_ACCESS_KEY}",
-            secretKey: "${MY_S3_SECRET_KEY}",
+            format: "properties",
+            properties: {
+              bucket: "bucko",
+              endpoint: "http://s3:4566",
+              accessKey: "${MY_S3_ACCESS_KEY}",
+              secretKey: "${MY_S3_SECRET_KEY}",
+            },
           },
           basePrefix: "/backups",
           ...common,
@@ -200,10 +203,13 @@ export namespace TestFixture {
         const step: Step.S3Download = {
           type: Step.Type.s3_download,
           connection: {
-            bucket: "bucko",
-            endpoint: "http://s3:4566",
-            accessKey: "${MY_S3_ACCESS_KEY}",
-            secretKey: "${MY_S3_SECRET_KEY}",
+            format: "properties",
+            properties: {
+              bucket: "bucko",
+              endpoint: "http://s3:4566",
+              accessKey: "${MY_S3_ACCESS_KEY}",
+              secretKey: "${MY_S3_SECRET_KEY}",
+            },
           },
           basePrefix: "/backups",
           managedStorage: {
@@ -216,7 +222,7 @@ export namespace TestFixture {
       case Step.Type.postgresql_backup: {
         const step: Step.PostgresqlBackup = {
           type: Step.Type.postgresql_backup,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: { resolution: "automatic" },
           databaseSelection: {
             method: "all",
@@ -228,7 +234,7 @@ export namespace TestFixture {
       case Step.Type.postgresql_restore: {
         const step: Step.PostgresqlRestore = {
           type: Step.Type.postgresql_restore,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: { resolution: "automatic" },
           database: "test_db",
           ...common,
@@ -238,7 +244,7 @@ export namespace TestFixture {
       case Step.Type.mariadb_backup: {
         const step: Step.MariadbBackup = {
           type: Step.Type.mariadb_backup,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: { resolution: "automatic" },
           databaseSelection: {
             method: "all",
@@ -250,7 +256,7 @@ export namespace TestFixture {
       case Step.Type.mariadb_restore: {
         const step: Step.MariadbRestore = {
           type: Step.Type.mariadb_restore,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: { resolution: "automatic" },
           database: "test_db",
           ...common,

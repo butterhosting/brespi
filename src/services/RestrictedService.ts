@@ -41,7 +41,7 @@ export class RestrictedService {
           id: "A",
           object: "step",
           type: Step.Type.postgresql_backup,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -75,10 +75,13 @@ export class RestrictedService {
           object: "step",
           type: Step.Type.s3_upload,
           connection: {
-            bucket: "bucko",
-            endpoint: "http://s3:4566",
-            accessKey: "${MY_S3_ACCESS_KEY}",
-            secretKey: "${MY_S3_SECRET_KEY}",
+            format: "properties",
+            properties: {
+              bucket: "bucko",
+              endpoint: "http://s3:4566",
+              accessKey: "${MY_S3_ACCESS_KEY}",
+              secretKey: "${MY_S3_SECRET_KEY}",
+            },
           },
           basePrefix: "postgresql-backups",
           retention: {
@@ -96,7 +99,7 @@ export class RestrictedService {
           previousId: "hbnijprgbhjg",
           object: "step",
           type: Step.Type.postgresql_restore,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -137,7 +140,7 @@ export class RestrictedService {
           previousId: "ytnzxdfmegvi",
           object: "step",
           type: Step.Type.postgresql_restore,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -148,7 +151,7 @@ export class RestrictedService {
           previousId: "khtdstqezwyh",
           object: "step",
           type: Step.Type.postgresql_restore,
-          connection: "${MY_POSTGRESQL_URL}",
+          connection: { format: "url", url: "${MY_POSTGRESQL_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -159,10 +162,13 @@ export class RestrictedService {
           object: "step",
           type: Step.Type.s3_download,
           connection: {
-            bucket: "bucko",
-            endpoint: "http://s3:4566",
-            accessKey: "${MY_S3_ACCESS_KEY}",
-            secretKey: "${MY_S3_SECRET_KEY}",
+            format: "properties",
+            properties: {
+              bucket: "bucko",
+              endpoint: "http://s3:4566",
+              accessKey: "${MY_S3_ACCESS_KEY}",
+              secretKey: "${MY_S3_SECRET_KEY}",
+            },
           },
           basePrefix: "postgresql-backups",
           managedStorage: {
@@ -202,7 +208,7 @@ export class RestrictedService {
           previousId: undefined,
           object: "step",
           type: Step.Type.mariadb_backup,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -243,7 +249,7 @@ export class RestrictedService {
           previousId: "hbnijprgbhjg",
           object: "step",
           type: Step.Type.mariadb_restore,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -284,7 +290,7 @@ export class RestrictedService {
           previousId: "ytnzxdfmegvi",
           object: "step",
           type: Step.Type.mariadb_restore,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -295,7 +301,7 @@ export class RestrictedService {
           previousId: "khtdstqezwyh",
           object: "step",
           type: Step.Type.mariadb_restore,
-          connection: "${MY_MARIADB_URL}",
+          connection: { format: "url", url: "${MY_MARIADB_URL}" },
           toolkit: {
             resolution: "automatic",
           },
@@ -314,7 +320,7 @@ export class RestrictedService {
           id: "vuyrysklhiwt",
           object: "step",
           type: Step.Type.mariadb_backup,
-          connection: "",
+          connection: { format: "url", url: "" },
           toolkit: {
             resolution: "automatic",
           },
@@ -327,7 +333,7 @@ export class RestrictedService {
           previousId: "vuyrysklhiwt",
           object: "step",
           type: Step.Type.mariadb_restore,
-          connection: "",
+          connection: { format: "url", url: "" },
           toolkit: {
             resolution: "automatic",
           },
@@ -338,7 +344,7 @@ export class RestrictedService {
           previousId: "blgivzxexrwu",
           object: "step",
           type: Step.Type.postgresql_backup,
-          connection: "",
+          connection: { format: "url", url: "" },
           toolkit: {
             resolution: "automatic",
           },
@@ -351,7 +357,7 @@ export class RestrictedService {
           previousId: "woivjjqictlp",
           object: "step",
           type: Step.Type.postgresql_restore,
-          connection: "",
+          connection: { format: "url", url: "" },
           toolkit: {
             resolution: "automatic",
           },
@@ -378,10 +384,13 @@ export class RestrictedService {
           object: "step",
           type: Step.Type.s3_upload,
           connection: {
-            bucket: "",
-            endpoint: "",
-            accessKey: "",
-            secretKey: "",
+            format: "properties",
+            properties: {
+              bucket: "",
+              endpoint: "",
+              accessKey: "",
+              secretKey: "",
+            },
           },
           basePrefix: "",
         },
@@ -391,10 +400,13 @@ export class RestrictedService {
           object: "step",
           type: Step.Type.s3_download,
           connection: {
-            bucket: "",
-            endpoint: "",
-            accessKey: "",
-            secretKey: "",
+            format: "properties",
+            properties: {
+              bucket: "",
+              endpoint: "",
+              accessKey: "",
+              secretKey: "",
+            },
           },
           basePrefix: "",
           managedStorage: {

@@ -9,7 +9,7 @@
           "id": "u8ha0p",
           "object": "step",
           "type": "postgresql_backup",
-          "connection": "${PG_CONNECTION_STRING}",
+          "connection": { "format": "url", "url": "${PG_CONNECTION_STRING}" },
           "toolkit": {
             "resolution": "automatic"
           },
@@ -44,11 +44,14 @@
           "object": "step",
           "type": "s3_upload",
           "connection": {
-            "bucket": "company-backups",
-            "region": "us-east-1",
-            "endpoint": "https://s3.us-east-1.amazonaws.com",
-            "accessKey": "${AWS_ACCESS_KEY_ID}",
-            "secretKey": "${AWS_SECRET_ACCESS_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "company-backups",
+              "region": "us-east-1",
+              "endpoint": "https://s3.us-east-1.amazonaws.com",
+              "accessKey": "${AWS_ACCESS_KEY_ID}",
+              "secretKey": "${AWS_SECRET_ACCESS_KEY}"
+            }
           },
           "basePrefix": "postgresql/production",
           "retention": {

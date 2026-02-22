@@ -7,8 +7,21 @@ import { useEffect } from "react";
 const { summary, Field, Label, Description } = FormHelper.meta({
   summary: "Used for uploading file artifacts to S3-compatible storage.",
   fields: {
-    connection_bucket: {
-      label: "Bucket",
+    connection_format: {
+      label: "Connection: format",
+      description: "Specifies whether to provide connection details as a URL or as individual properties.",
+    },
+    connection_url: {
+      label: "Connection: url",
+      description: (
+        <>
+          Specifies the S3 connection string in the format{" "}
+          <FormElements.Code break>s3://accessKey:secretKey@endpoint/bucket?region=us-east-1</FormElements.Code>.
+        </>
+      ),
+    },
+    connection_properties_bucket: {
+      label: "Connection: bucket",
       description: "Specifies the S3 bucket name to upload to.",
     },
     basePrefix: {
@@ -16,20 +29,20 @@ const { summary, Field, Label, Description } = FormHelper.meta({
       description:
         'Specifies the base S3 path prefix where artifacts will be uploaded to managed storage. If no "managed storage root" is detected at the provided base prefix, it will be initialized upon first execution.',
     },
-    connection_region: {
-      label: "Region",
+    connection_properties_region: {
+      label: "Connection: region",
       description: "Specifies the region for the S3 bucket.",
     },
-    connection_endpoint: {
-      label: "Endpoint",
+    connection_properties_endpoint: {
+      label: "Connection: endpoint",
       description: "Specifies the S3 endpoint URL.",
     },
-    connection_accessKey: {
-      label: "Access key",
+    connection_properties_accessKey: {
+      label: "Connection: access key",
       description: "Specifies the S3 access key.",
     },
-    connection_secretKey: {
-      label: "Secret key",
+    connection_properties_secretKey: {
+      label: "Connection: secret key",
       description: "Specifies the S3 secret key.",
     },
     managedStorage: {
@@ -48,24 +61,29 @@ const { summary, Field, Label, Description } = FormHelper.meta({
 });
 
 type Form = {
-  [Field.connection_bucket]: string;
+  [Field.connection_format]: "url" | "properties";
+  [Field.connection_url]: string;
+  [Field.connection_properties_bucket]: string;
   [Field.basePrefix]: string;
-  [Field.connection_region]: string;
-  [Field.connection_endpoint]: string;
-  [Field.connection_accessKey]: string;
-  [Field.connection_secretKey]: string;
+  [Field.connection_properties_region]: string;
+  [Field.connection_properties_endpoint]: string;
+  [Field.connection_properties_accessKey]: string;
+  [Field.connection_properties_secretKey]: string;
   [Field.managedStorage]: "true";
   [Field.retentionPolicy]: "none" | "last_n_versions";
   [Field.retentionMaxVersions]: number;
 };
 function defaultValues(existing: Step.S3Upload | undefined): Form {
+  const props = existing?.connection.format === "properties" ? existing.connection.properties : undefined;
   return {
-    [Field.connection_bucket]: existing?.connection.bucket ?? "",
+    [Field.connection_format]: existing?.connection.format ?? "url",
+    [Field.connection_url]: existing?.connection.format === "url" ? existing.connection.url : "",
+    [Field.connection_properties_bucket]: props?.bucket ?? "",
     [Field.basePrefix]: existing?.basePrefix ?? "",
-    [Field.connection_region]: existing?.connection.region ?? "",
-    [Field.connection_endpoint]: existing?.connection.endpoint ?? "",
-    [Field.connection_accessKey]: existing?.connection.accessKey ?? "",
-    [Field.connection_secretKey]: existing?.connection.secretKey ?? "",
+    [Field.connection_properties_region]: props?.region ?? "",
+    [Field.connection_properties_endpoint]: props?.endpoint ?? "",
+    [Field.connection_properties_accessKey]: props?.accessKey ?? "",
+    [Field.connection_properties_secretKey]: props?.secretKey ?? "",
     [Field.managedStorage]: "true",
     [Field.retentionPolicy]: existing ? (existing.retention ? existing.retention.policy : "none") : "none",
     [Field.retentionMaxVersions]: existing ? (existing.retention ? existing.retention.maxVersions : 10) : 10,
@@ -93,13 +111,19 @@ export function S3UploadForm({ id, existing, onSave, onDelete, onCancel, classNa
         previousId: existing?.previousId,
         object: "step",
         type: Step.Type.s3_upload,
-        connection: {
-          bucket: values[Field.connection_bucket],
-          region: values[Field.connection_region] || undefined,
-          endpoint: values[Field.connection_endpoint],
-          accessKey: values[Field.connection_accessKey],
-          secretKey: values[Field.connection_secretKey],
-        },
+        connection:
+          values[Field.connection_format] === "url"
+            ? { format: "url", url: values[Field.connection_url] }
+            : {
+                format: "properties",
+                properties: {
+                  bucket: values[Field.connection_properties_bucket],
+                  region: values[Field.connection_properties_region] || undefined,
+                  endpoint: values[Field.connection_properties_endpoint],
+                  accessKey: values[Field.connection_properties_accessKey],
+                  secretKey: values[Field.connection_properties_secretKey],
+                },
+              },
         basePrefix: values[Field.basePrefix],
         retention:
           values[Field.retentionPolicy] === "last_n_versions"
@@ -113,6 +137,7 @@ export function S3UploadForm({ id, existing, onSave, onDelete, onCancel, classNa
     }
   };
 
+  const connectionFormat = form.watch(Field.connection_format);
   const retentionPolicy = form.watch(Field.retentionPolicy);
   const { activeField, setActiveField } = FormElements.useActiveField<Form>();
   return (
@@ -120,47 +145,69 @@ export function S3UploadForm({ id, existing, onSave, onDelete, onCancel, classNa
       <FormElements.Left>
         <fieldset disabled={form.formState.isSubmitting} className="flex flex-col gap-4">
           <FormElements.LabeledInput
-            field={Field.connection_bucket}
+            field={Field.connection_format}
             labels={Label}
             register={form.register}
             activeField={activeField}
             onActiveFieldChange={setActiveField}
-            input={{ type: "text" }}
+            input={{ type: "select", options: ["url", "properties"] }}
           />
+          {connectionFormat === "url" && (
+            <FormElements.LabeledInput
+              field={Field.connection_url}
+              labels={Label}
+              register={form.register}
+              activeField={activeField}
+              onActiveFieldChange={setActiveField}
+              input={{ type: "text" }}
+            />
+          )}
+          {connectionFormat === "properties" && (
+            <>
+              <FormElements.LabeledInput
+                field={Field.connection_properties_bucket}
+                labels={Label}
+                register={form.register}
+                activeField={activeField}
+                onActiveFieldChange={setActiveField}
+                input={{ type: "text" }}
+              />
+              <FormElements.LabeledInput
+                field={Field.connection_properties_region}
+                labels={Label}
+                register={form.register}
+                activeField={activeField}
+                onActiveFieldChange={setActiveField}
+                input={{ type: "text" }}
+              />
+              <FormElements.LabeledInput
+                field={Field.connection_properties_endpoint}
+                labels={Label}
+                register={form.register}
+                activeField={activeField}
+                onActiveFieldChange={setActiveField}
+                input={{ type: "text" }}
+              />
+              <FormElements.LabeledInput
+                field={Field.connection_properties_accessKey}
+                labels={Label}
+                register={form.register}
+                activeField={activeField}
+                onActiveFieldChange={setActiveField}
+                input={{ type: "text" }}
+              />
+              <FormElements.LabeledInput
+                field={Field.connection_properties_secretKey}
+                labels={Label}
+                register={form.register}
+                activeField={activeField}
+                onActiveFieldChange={setActiveField}
+                input={{ type: "text" }}
+              />
+            </>
+          )}
           <FormElements.LabeledInput
             field={Field.basePrefix}
-            labels={Label}
-            register={form.register}
-            activeField={activeField}
-            onActiveFieldChange={setActiveField}
-            input={{ type: "text" }}
-          />
-          <FormElements.LabeledInput
-            field={Field.connection_region}
-            labels={Label}
-            register={form.register}
-            activeField={activeField}
-            onActiveFieldChange={setActiveField}
-            input={{ type: "text" }}
-          />
-          <FormElements.LabeledInput
-            field={Field.connection_endpoint}
-            labels={Label}
-            register={form.register}
-            activeField={activeField}
-            onActiveFieldChange={setActiveField}
-            input={{ type: "text" }}
-          />
-          <FormElements.LabeledInput
-            field={Field.connection_accessKey}
-            labels={Label}
-            register={form.register}
-            activeField={activeField}
-            onActiveFieldChange={setActiveField}
-            input={{ type: "text" }}
-          />
-          <FormElements.LabeledInput
-            field={Field.connection_secretKey}
             labels={Label}
             register={form.register}
             activeField={activeField}

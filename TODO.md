@@ -1,7 +1,3 @@
-# Brespi
-
-This is a work in progress with the following TODO's:
-
 ### Execution
 * ✅ Add descriptions with label hovering/clicking mechanics to each step
 * ✅ Share the `Fields` enum between the `StepForm` and `StepTranslation` (rename the latter)
@@ -50,7 +46,6 @@ This is a work in progress with the following TODO's:
 * ✅ Refactor so the backend ALWAYS uses TZ=UTC for it's PlainDateTime objects ... but provide an environment option BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE with a default of UTC (if people wanna see their versions in a particular timestamp) --- but the internal default for PlainDateTime should be UTC always
 * ✅ Check if the `*Converter` classes can be made part of the Drizzle entity definition
 * ✅ Allow env var references on all text fields via the ${...} syntax (on the right side; give an overview of detected env vars in orange; this also requires updating descriptions)
-* ✅ Handle TODO comments
 * Upgrade all dependencies
 
 ### Polish

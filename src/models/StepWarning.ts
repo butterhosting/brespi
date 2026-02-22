@@ -16,12 +16,12 @@ export namespace StepWarning {
     const result: SensitiveFieldsMap = {
       [Step.Type.encryption]: ["key"],
       [Step.Type.decryption]: ["key"],
-      [Step.Type.s3_upload]: ["connection.secretKey"],
-      [Step.Type.s3_download]: ["connection.secretKey"],
-      [Step.Type.postgresql_backup]: ["connection"],
-      [Step.Type.postgresql_restore]: ["connection"],
-      [Step.Type.mariadb_backup]: ["connection"],
-      [Step.Type.mariadb_restore]: ["connection"],
+      [Step.Type.s3_upload]: ["connection.url", "connection.properties.secretKey"],
+      [Step.Type.s3_download]: ["connection.url", "connection.properties.secretKey"],
+      [Step.Type.postgresql_backup]: ["connection.url", "connection.properties.password"],
+      [Step.Type.postgresql_restore]: ["connection.url", "connection.properties.password"],
+      [Step.Type.mariadb_backup]: ["connection.url", "connection.properties.password"],
+      [Step.Type.mariadb_restore]: ["connection.url", "connection.properties.password"],
     };
     return type ? result[type] || [] : result;
   }

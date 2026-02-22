@@ -22,11 +22,14 @@ describe(S3Adapter.name, async () => {
   });
 
   const connection: Step.S3Connection = {
-    bucket: "irrelevant",
-    region: undefined,
-    endpoint: "http://irrelevant",
-    secretKey: "${SECRET_KEY}",
-    accessKey: "${ACCESS_KEY}",
+    format: "properties",
+    properties: {
+      bucket: "irrelevant",
+      region: undefined,
+      endpoint: "http://irrelevant",
+      secretKey: "${SECRET_KEY}",
+      accessKey: "${ACCESS_KEY}",
+    },
   };
 
   const testCases: Array<{ from: string; to: string }> = [

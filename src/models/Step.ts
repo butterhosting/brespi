@@ -68,13 +68,32 @@ export namespace Step {
     | { method: "glob"; nameGlob: string }
     | { method: "regex"; nameRegex: string };
 
-  export type S3Connection = {
+  export type DatabaseConnectionProperties = {
+    user: string;
+    password: string;
+    host: string;
+    port?: string;
+  };
+
+  export type S3ConnectionProperties = {
     bucket: string;
     region?: string;
     endpoint: string;
     accessKey: string;
     secretKey: string;
   };
+
+  export type PostgresqlConnection =
+    | { format: "url"; url: string } //
+    | { format: "properties"; properties: DatabaseConnectionProperties };
+
+  export type MariadbConnection =
+    | { format: "url"; url: string } //
+    | { format: "properties"; properties: DatabaseConnectionProperties };
+
+  export type S3Connection =
+    | { format: "url"; url: string } //
+    | { format: "properties"; properties: S3ConnectionProperties };
 
   export type Compression = Common & {
     type: Type.compression;
@@ -157,7 +176,7 @@ export namespace Step {
 
   export type PostgresqlBackup = Common & {
     type: Type.postgresql_backup;
-    connection: string;
+    connection: PostgresqlConnection;
     toolkit:
       | { resolution: "automatic" } //
       | { resolution: "manual"; psql: string; pg_dump: string };
@@ -169,7 +188,7 @@ export namespace Step {
 
   export type PostgresqlRestore = Common & {
     type: Type.postgresql_restore;
-    connection: string;
+    connection: PostgresqlConnection;
     toolkit:
       | { resolution: "automatic" } //
       | { resolution: "manual"; psql: string; pg_restore: string };
@@ -178,7 +197,7 @@ export namespace Step {
 
   export type MariadbBackup = Common & {
     type: Type.mariadb_backup;
-    connection: string;
+    connection: MariadbConnection;
     toolkit:
       | { resolution: "automatic" } //
       | { resolution: "manual"; mariadb: string; "mariadb-dump": string };
@@ -190,7 +209,7 @@ export namespace Step {
 
   export type MariadbRestore = Common & {
     type: Type.mariadb_restore;
-    connection: string;
+    connection: MariadbConnection;
     toolkit:
       | { resolution: "automatic" } //
       | { resolution: "manual"; mariadb: string };
@@ -242,13 +261,43 @@ export namespace Step {
           z.object({ method: z.literal("glob"), nameGlob: z.string() }),
           z.object({ method: z.literal("regex"), nameRegex: z.string() }),
         ]),
-        s3Connection: z.object({
-          bucket: z.string(),
-          region: z.string().optional(),
-          endpoint: z.string(),
-          accessKey: z.string(),
-          secretKey: z.string(),
-        } satisfies SubSchema<S3Connection>),
+        postgresqlConnection: z.union([
+          z.object({ format: z.literal("url"), url: z.string() }),
+          z.object({
+            format: z.literal("properties"),
+            properties: z.object({
+              user: z.string(),
+              password: z.string(),
+              host: z.string(),
+              port: z.string().optional(),
+            }),
+          }),
+        ]) as z.ZodType<PostgresqlConnection>,
+        mariadbConnection: z.union([
+          z.object({ format: z.literal("url"), url: z.string() }),
+          z.object({
+            format: z.literal("properties"),
+            properties: z.object({
+              user: z.string(),
+              password: z.string(),
+              host: z.string(),
+              port: z.string().optional(),
+            }),
+          }),
+        ]) as z.ZodType<MariadbConnection>,
+        s3Connection: z.union([
+          z.object({ format: z.literal("url"), url: z.string() }),
+          z.object({
+            format: z.literal("properties"),
+            properties: z.object({
+              bucket: z.string(),
+              region: z.string().optional(),
+              endpoint: z.string(),
+              accessKey: z.string(),
+              secretKey: z.string(),
+            }),
+          }),
+        ]) as z.ZodType<S3Connection>,
       };
 
       return z.discriminatedUnion("type", [
@@ -366,7 +415,7 @@ export namespace Step {
         z.object({
           ...subSchema.common,
           type: z.literal(Type.postgresql_backup),
-          connection: z.string(),
+          connection: subSchema.postgresqlConnection,
           toolkit: z.union([
             z.object({ resolution: z.literal("automatic") }),
             z.object({
@@ -385,7 +434,7 @@ export namespace Step {
         z.object({
           ...subSchema.common,
           type: z.literal(Type.postgresql_restore),
-          connection: z.string(),
+          connection: subSchema.postgresqlConnection,
           toolkit: z.union([
             z.object({ resolution: z.literal("automatic") }),
             z.object({
@@ -400,7 +449,7 @@ export namespace Step {
         z.object({
           ...subSchema.common,
           type: z.literal(Type.mariadb_backup),
-          connection: z.string(),
+          connection: subSchema.mariadbConnection,
           toolkit: z.union([
             z.object({ resolution: z.literal("automatic") }),
             z.object({
@@ -419,7 +468,7 @@ export namespace Step {
         z.object({
           ...subSchema.common,
           type: z.literal(Type.mariadb_restore),
-          connection: z.string(),
+          connection: subSchema.mariadbConnection,
           toolkit: z.union([
             z.object({ resolution: z.literal("automatic") }),
             z.object({

@@ -10,6 +10,7 @@ import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
 import { BrespiS3Client } from "./BrespiS3Client";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
+import { UrlParser } from "@/helpers/UrlParser";
 
 export class S3Adapter extends AbstractAdapter {
   public constructor(
@@ -98,14 +99,23 @@ export class S3Adapter extends AbstractAdapter {
   }
 
   private constructClient(connection: Step.S3Connection) {
-    const accessKeyId = this.resolveString(connection.accessKey);
-    const secretAccessKey = this.resolveString(connection.secretKey);
+    if (connection.format === "url") {
+      const { accessKey, secretKey, endpoint, bucket, region } = UrlParser.s3(this.resolveString(connection.url));
+      return new BrespiS3Client({
+        bucket,
+        endpoint,
+        region,
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey,
+      });
+    }
+    const { properties } = connection;
     return new BrespiS3Client({
-      bucket: this.resolveString(connection.bucket),
-      endpoint: this.resolveString(connection.endpoint),
-      region: connection.region ? this.resolveString(connection.region) : undefined,
-      accessKeyId,
-      secretAccessKey,
+      bucket: this.resolveString(properties.bucket),
+      endpoint: this.resolveString(properties.endpoint),
+      region: properties.region ? this.resolveString(properties.region) : undefined,
+      accessKeyId: this.resolveString(properties.accessKey),
+      secretAccessKey: this.resolveString(properties.secretKey),
     });
   }
 

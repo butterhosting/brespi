@@ -10,11 +10,14 @@
           "object": "step",
           "type": "s3_download",
           "connection": {
-            "bucket": "company-backups",
-            "region": "us-east-1",
-            "endpoint": "https://s3.us-east-1.amazonaws.com",
-            "accessKey": "${AWS_ACCESS_KEY_ID}",
-            "secretKey": "${AWS_SECRET_ACCESS_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "company-backups",
+              "region": "us-east-1",
+              "endpoint": "https://s3.us-east-1.amazonaws.com",
+              "accessKey": "${AWS_ACCESS_KEY_ID}",
+              "secretKey": "${AWS_SECRET_ACCESS_KEY}"
+            }
           },
           "basePrefix": "postgresql/production",
           "managedStorage": {
@@ -55,7 +58,7 @@
           "previousId": "g6v3sn",
           "object": "step",
           "type": "postgresql_restore",
-          "connection": "${PG_STAGING_CONNECTION}",
+          "connection": { "format": "url", "url": "${PG_STAGING_CONNECTION}" },
           "toolkit": {
             "resolution": "automatic"
           },

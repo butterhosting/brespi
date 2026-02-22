@@ -10,11 +10,14 @@
           "object": "step",
           "type": "s3_download",
           "connection": {
-            "bucket": "source-bucket",
-            "region": "us-west-2",
-            "endpoint": "https://s3.us-west-2.amazonaws.com",
-            "accessKey": "${AWS_SOURCE_ACCESS_KEY}",
-            "secretKey": "${AWS_SOURCE_SECRET_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "source-bucket",
+              "region": "us-west-2",
+              "endpoint": "https://s3.us-west-2.amazonaws.com",
+              "accessKey": "${AWS_SOURCE_ACCESS_KEY}",
+              "secretKey": "${AWS_SOURCE_SECRET_KEY}"
+            }
           },
           "basePrefix": "data/exports",
           "managedStorage": {
@@ -44,11 +47,14 @@
           "object": "step",
           "type": "s3_upload",
           "connection": {
-            "bucket": "destination-bucket",
-            "region": "eu-west-1",
-            "endpoint": "https://s3.eu-west-1.amazonaws.com",
-            "accessKey": "${AWS_DEST_ACCESS_KEY}",
-            "secretKey": "${AWS_DEST_SECRET_KEY}"
+            "format": "properties",
+            "properties": {
+              "bucket": "destination-bucket",
+              "region": "eu-west-1",
+              "endpoint": "https://s3.eu-west-1.amazonaws.com",
+              "accessKey": "${AWS_DEST_ACCESS_KEY}",
+              "secretKey": "${AWS_DEST_SECRET_KEY}"
+            }
           },
           "basePrefix": "replicated/data"
         }

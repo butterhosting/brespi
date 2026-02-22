@@ -9,7 +9,7 @@
           "id": "moc0hd",
           "object": "step",
           "type": "mariadb_backup",
-          "connection": "${MARIA_CONNECTION_STRING}",
+          "connection": { "format": "url", "url": "${MARIA_CONNECTION_STRING}" },
           "toolkit": {
             "resolution": "manual",
             "mariadb": "/usr/bin/mariadb",
