@@ -86,7 +86,9 @@ export class S3Adapter extends AbstractAdapter {
       selectableArtifacts = selectableArtifacts.filter(predicate);
     }
     // Retrieve artifacts
-    this.log.debug(`Preparing to download artifacts; bucket=${client.options.bucket}, selectableArtifacts.length=${selectableArtifacts.length}`);
+    this.log.debug(
+      `Preparing to download artifacts; bucket=${client.options.bucket}, selectableArtifacts.length=${selectableArtifacts.length}`,
+    );
     const artifacts: Artifact[] = [];
     for (const { name, path } of selectableArtifacts) {
       const { outputId, outputPath } = this.generateArtifactDestination();
@@ -99,7 +101,9 @@ export class S3Adapter extends AbstractAdapter {
       });
     }
 
-    this.log.info(`Successfully downloaded artifacts; bucket=${client.options.bucket}, version=${resolvedVersion}, artifacts.length=${artifacts.length}`);
+    this.log.info(
+      `Successfully downloaded artifacts; bucket=${client.options.bucket}, version=${resolvedVersion}, artifacts.length=${artifacts.length}`,
+    );
     return AdapterResult.create(artifacts, { version: resolvedVersion });
   }
 

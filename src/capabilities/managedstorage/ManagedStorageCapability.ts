@@ -1,6 +1,7 @@
 import { Env } from "@/Env";
 import { ExecutionError } from "@/errors/ExecutionError";
 import { Mutex } from "@/helpers/Mutex";
+import { Logger } from "@/Logger";
 import { Artifact } from "@/models/Artifact";
 import { Step } from "@/models/Step";
 import { StepWithRuntime } from "@/models/StepWithRuntime";
@@ -10,6 +11,8 @@ import { Manifest } from "./Manifest";
 import { Version } from "./Version";
 
 export class ManagedStorageCapability {
+  private readonly log = new Logger(__filename);
+
   public constructor(private readonly env: Env.Private) {}
 
   public async insert({
@@ -21,6 +24,7 @@ export class ManagedStorageCapability {
     writeFn,
   }: ManagedStorageCapability.InsertOptions): Promise<ManagedStorageCapability.InsertResult> {
     // 0. Calculate the file sizes
+    this.log.debug(`Calculating artifact file sizes; artifacts.length=${artifacts.length}`);
     const artifactSizes = new Map<string, number>();
     for (const { name, path } of artifacts) {
       const file = Bun.file(path);
@@ -54,15 +58,18 @@ export class ManagedStorageCapability {
       },
     });
     // 2. Update the manifest (exclusively)
+    this.log.debug(`Acquiring mutex to update manifest; base=${base}`);
     let listingDetails: ReturnType<typeof createListingDetails>;
     const { release } = await Mutex.acquireFromRegistry({ key: mutexKey });
     try {
       const mfPath = join(base, Manifest.NAME);
       const mfFile = await readFn(mfPath);
       const existingMf: Manifest = mfFile === undefined ? Manifest.empty() : this.parseManifest(mfFile);
+      this.log.debug(`Read manifest; base=${base}, existingItems.length=${existingMf.items.length}`);
 
       const version = await this.waitForAvailableTimestamp(existingMf);
       listingDetails = createListingDetails(version);
+      this.log.debug(`Assigned version; version=${version}`);
 
       const updatedMf: Manifest = {
         ...existingMf,
@@ -83,11 +90,13 @@ export class ManagedStorageCapability {
       release();
     }
     // 3. Write the listing
+    this.log.debug(`Writing listing; listingPath=${listingDetails.relativePath}`);
     await writeFn({
       path: join(base, listingDetails.relativePath),
       content: JSON.stringify(listingDetails.content),
     });
     // 4. Return the insertable artifacts
+    this.log.debug(`Insert complete; insertableArtifacts.length=${artifacts.length}`);
     return {
       insertableArtifacts: artifacts.map(({ name, path }) => ({
         name,
@@ -104,6 +113,7 @@ export class ManagedStorageCapability {
     configuration,
   }: ManagedStorageCapability.SelectOptions): Promise<ManagedStorageCapability.SelectResult> {
     // 1. Read the manifest
+    this.log.debug(`Acquiring mutex to read manifest; base=${base}, target=${configuration.target}`);
     let manifest: Manifest;
     const { release } = await Mutex.acquireFromRegistry({ key: mutexKey });
     try {
@@ -114,11 +124,14 @@ export class ManagedStorageCapability {
       release();
     }
     // 2. Find a matching listing, based on the configuration
+    this.log.debug(`Read manifest; base=${base}, items.length=${manifest.items.length}`);
     const mfItem = this.findMatchingItem(manifest, configuration);
+    this.log.debug(`Matched version; version=${mfItem.version}, listingPath=${mfItem.listingPath}`);
     const listingPath = join(base, mfItem.listingPath);
     const listingFile = await readFn(listingPath);
     const listing = this.parseListing(listingFile!);
     // 3. Return the selectable artifacts
+    this.log.debug(`Select complete; version=${mfItem.version}, selectableArtifacts.length=${listing.artifacts.length}`);
     return {
       resolvedVersion: mfItem.version,
       selectableArtifacts: listing.artifacts.map(({ path }) => ({
@@ -136,16 +149,19 @@ export class ManagedStorageCapability {
     writeFn,
   }: ManagedStorageCapability.CleanOptions): Promise<ManagedStorageCapability.CleanResult> {
     // 1. Read the manifest
+    this.log.debug(`Acquiring mutex for retention cleanup; base=${base}, maxVersions=${configuration.maxVersions}`);
     let removableItems: Manifest.Item[];
     const { release } = await Mutex.acquireFromRegistry({ key: mutexKey });
     try {
       const mfPath = join(base, Manifest.NAME);
       const mfFile = await readFn(mfPath);
       const existingMf = this.parseManifest(mfFile!);
+      this.log.debug(`Read manifest; base=${base}, existingItems.length=${existingMf.items.length}`);
       // 2. Determine the removable items
       removableItems = existingMf.items.toSorted(Manifest.Item.sort).filter((_, index) => {
         return index >= configuration.maxVersions;
       });
+      this.log.debug(`Determined removable items; removableItems.length=${removableItems.length}`);
       const removableItemIds = removableItems.map(({ listingPath: id }) => id);
       // 3. Update the manifest
       const updatedMf: Manifest = {
@@ -160,6 +176,7 @@ export class ManagedStorageCapability {
       release();
     }
     // 3. Return the removable items
+    this.log.debug(`Clean complete; removableItems.length=${removableItems.length}`);
     return { removableItems };
   }
 
