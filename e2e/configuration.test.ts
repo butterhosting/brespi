@@ -15,7 +15,7 @@ test.describe("pipelines affects configuration and sync status", () => {
   for (const configurationAction of ["Save changes", "Discard changes"] as const) {
     test(configurationAction, async ({ page }) => {
       // given
-      await assertConfigurationState(page, "in_sync");
+      await assertConfigurationState(page, "empty");
 
       // when
       await PipelineFlow.create(page, {
@@ -40,7 +40,13 @@ test.describe("pipelines affects configuration and sync status", () => {
         configurationAction satisfies never;
       }
       // then
-      await assertConfigurationState(page, "in_sync");
+      if (configurationAction === "Save changes") {
+        await assertConfigurationState(page, "in_sync");
+      } else if (configurationAction === "Discard changes") {
+        await assertConfigurationState(page, "empty");
+      } else {
+        configurationAction satisfies never;
+      }
 
       // when
       await page.getByRole("link", { name: "Pipelines" }).click();
@@ -110,14 +116,21 @@ test("when configuration is reinstated, schedules and policies are activated", a
   await ResetBoundary.reset(request); // cleanup the hanging schedule
 });
 
-async function assertConfigurationState(page: Page, state: "in_sync" | "out_of_sync") {
+async function assertConfigurationState(page: Page, state: "empty" | "in_sync" | "out_of_sync") {
   const outOfSyncLocator = page.getByTestId("conf-out-of-sync");
   const navigate = () => page.getByRole("link", { name: "Configuration" }).click();
   switch (state) {
+    case "empty":
     case "in_sync": {
       await expect(outOfSyncLocator).not.toBeVisible();
       await navigate();
-      await expect(page.getByText(/^The current configuration is either empty or matches .+\/brespi\/config\.json$/)).toBeVisible();
+      if (state === "empty") {
+        await expect(page.getByText(/^The current configuration is empty.$/)).toBeVisible();
+      } else if (state === "in_sync") {
+        await expect(page.getByText(/^The current configuration successfully matches .+\/brespi\/config\.json$/)).toBeVisible();
+      } else {
+        state satisfies never;
+      }
       break;
     }
     case "out_of_sync": {

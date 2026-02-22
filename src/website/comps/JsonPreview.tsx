@@ -24,7 +24,7 @@ export function JsonPreview({ data, maxLines = 8, className }: Props) {
   const showOverlay = !expanded && hiddenCount > 0;
 
   return (
-    <div className={clsx("relative overflow-hidden bg-c-dark p-5 border-2 border-c-dim rounded-xl", className)}>
+    <div className={clsx("relative overflow-hidden bg-black/20 p-5 border-2 border-c-dim rounded-xl", className)}>
       <pre className="font-mono text-sm leading-relaxed whitespace-pre-wrap break-all">{visibleLines}</pre>
       {showOverlay && (
         <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent flex items-end justify-end">

@@ -1,4 +1,5 @@
 import { ZodParser } from "@/helpers/ZodParser";
+import { Json } from "@/types/Json";
 import z from "zod/v4";
 import { NotificationPolicy } from "./NotificationPolicy";
 import { Pipeline } from "./Pipeline";
@@ -22,6 +23,25 @@ export namespace Configuration {
         notificationPolicies: [],
       };
     }
+    export function isEmpty(subject: Json): boolean {
+      if (!subject || typeof subject !== "object" || Array.isArray(subject)) {
+        return false;
+      }
+      const s = subject as Record<keyof Core, unknown>;
+      if (Object.keys(s).length !== Object.keys(Core.empty()).length) {
+        return false;
+      }
+      const isEmptyArray = (v: unknown) => Array.isArray(v) && v.length === 0;
+      // Record<keyof Core, ...> ensures every Core key is covered.
+      // Adding a property to Core without updating this will cause a type error.
+      const checks: Record<keyof Core, boolean> = {
+        pipelines: isEmptyArray(s.pipelines),
+        schedules: isEmptyArray(s.schedules),
+        notificationPolicies: isEmptyArray(s.notificationPolicies),
+      };
+      return Object.values(checks).every(Boolean);
+    }
+
     export const parse = ZodParser.forType<Core>()
       .ensureSchemaMatchesType(() =>
         z.object({

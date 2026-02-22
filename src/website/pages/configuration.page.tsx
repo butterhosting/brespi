@@ -9,6 +9,7 @@ import { Spinner } from "../comps/Spinner";
 import { useConfiguration } from "../hooks/useConfiguration";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useRegistry } from "../hooks/useRegistry";
+import { Configuration } from "@/models/Configuration";
 
 export function configurationPage() {
   useDocumentTitle("Configuration | Brespi");
@@ -56,9 +57,14 @@ export function configurationPage() {
         ) : query.data.synchronized ? (
           <div>
             <div className="flex justify-between items-center">
-              <p>
-                The current configuration is either empty or matches <code className="text-white">{O_BRESPI_CONFIGURATION}</code>
-              </p>
+              {Configuration.Core.isEmpty(query.data.coreConfiguration) ? (
+                <p>The current configuration is empty.</p>
+              ) : (
+                <p>
+                  The current configuration successfully matches{" "}
+                  <code className="text-white text-sm p-2 bg-black/20 rounded-lg text-shadow-lg">{O_BRESPI_CONFIGURATION}</code>
+                </p>
+              )}
               <Button theme="accent" onClick={copyToClipboard}>
                 Copy current configuration
               </Button>
