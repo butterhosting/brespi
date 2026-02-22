@@ -9,8 +9,10 @@ import { basename, join } from "path";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
+import { Logger } from "@/Logger";
 
 export class FilesystemAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   public constructor(
     protected readonly env: Env.Private,
     protected readonly propertyResolver: PropertyResolver,
@@ -33,6 +35,7 @@ export class FilesystemAdapter extends AbstractAdapter {
       const mutexKey = this.mutexKey(base);
       const readWriteFns = this.createReadWriteFns();
 
+      this.log.debug(`Preparing to update the storage manifest; folderPath=${folderPath}`);
       const { insertableArtifacts } = await this.managedStorageCapability.insert({
         mutexKey,
         artifacts,
@@ -40,22 +43,28 @@ export class FilesystemAdapter extends AbstractAdapter {
         base,
         ...readWriteFns,
       });
+
+      this.log.debug(`Preparing to write artifacts; folderPath=${folderPath}, insertableArtifacts.length=${insertableArtifacts.length}`);
       for (const { path, destinationPath } of insertableArtifacts) {
         await Bun.write(destinationPath, Bun.file(path));
       }
 
       if (step.retention) {
+        this.log.debug(`Preparing to update the storage manifest again for removal operations; folderPath=${folderPath}`);
         const { removableItems } = await this.managedStorageCapability.clean({
           mutexKey,
           base,
           configuration: step.retention,
           ...readWriteFns,
         });
+
+        this.log.debug(`Preparing to remove artifacts; folderPath=${folderPath}, removableItems.length=${removableItems.length}`);
         for (const { version } of removableItems) {
           await rm(join(base, version), { recursive: true, force: true });
         }
       }
     } else {
+      this.log.debug(`Preparing to write artifacts; folderPath=${folderPath}, artifacts.length=${artifacts.length}`);
       for (const artifact of artifacts) {
         const destinationPath = join(folderPath, artifact.name);
         if (artifact.type === "file") {
@@ -65,12 +74,15 @@ export class FilesystemAdapter extends AbstractAdapter {
         }
       }
     }
+
+    this.log.info(`Successfully wrote artifacts; folderPath=${folderPath}, artifacts.length=${artifacts.length}`);
     return AdapterResult.create();
   }
 
   public async read(step: Step.FilesystemRead): Promise<AdapterResult> {
     const path = this.resolveString(step.path);
     if (step.managedStorage) {
+      this.log.debug(`Selecting version from managed storage; path=${path}`);
       // Find artifacts
       let { resolvedVersion, selectableArtifacts } = await this.managedStorageCapability.select({
         mutexKey: this.mutexKey(path),
@@ -80,10 +92,12 @@ export class FilesystemAdapter extends AbstractAdapter {
       });
       // Optional: filter
       if (step.filterCriteria) {
+        this.log.debug(`Applying filter criteria; method=${step.filterCriteria.method}`);
         const { predicate } = this.filterCapability.createPredicate(step.filterCriteria);
         selectableArtifacts = selectableArtifacts.filter(predicate);
       }
       // Retrieve artifacts
+      this.log.debug(`Preparing to read artifacts; path=${path}, selectableArtifacts.length=${selectableArtifacts.length}`);
       const artifacts: Artifact[] = [];
       for (const { name, path } of selectableArtifacts) {
         const { outputId, outputPath } = this.generateArtifactDestination();
@@ -95,11 +109,16 @@ export class FilesystemAdapter extends AbstractAdapter {
           name,
         });
       }
+
+      this.log.info(`Successfully read artifacts; path=${path}, version=${resolvedVersion}, artifacts.length=${artifacts.length}`);
       return AdapterResult.create(artifacts, { version: resolvedVersion });
     } else {
+      this.log.debug(`Preparing to read from path; path=${path}`);
       const { outputId, outputPath } = this.generateArtifactDestination();
       const stats = await this.requireFilesystemExistence(path);
       await cp(path, outputPath, { recursive: true });
+
+      this.log.info(`Successfully read artifact; path=${path}, type=${stats.type}`);
       return AdapterResult.create({
         id: outputId,
         type: stats.type,
@@ -110,6 +129,7 @@ export class FilesystemAdapter extends AbstractAdapter {
   }
 
   public async folderFlatten(artifacts: Artifact[], step: Step.FolderFlatten): Promise<AdapterResult> {
+    this.log.debug(`Preparing to flatten artifacts; artifacts.length=${artifacts.length}`);
     const result: Artifact[] = [];
     for (const artifact of artifacts) {
       if (artifact.type === "file") {
@@ -118,15 +138,20 @@ export class FilesystemAdapter extends AbstractAdapter {
         result.push(...(await this.readDirectoryRecursively(artifact.path)));
       }
     }
+
+    this.log.info(`Successfully flattened artifacts; input.length=${artifacts.length}, output.length=${result.length}`);
     return AdapterResult.create(result);
   }
 
   public async folderGroup(artifacts: Artifact[], step: Step.FolderGroup): Promise<AdapterResult> {
+    this.log.debug(`Preparing to group artifacts; artifacts.length=${artifacts.length}`);
     const { outputId, outputPath } = this.generateArtifactDestination();
     await mkdir(outputPath);
     for (const artifact of artifacts) {
       await rename(artifact.path, join(outputPath, artifact.name));
     }
+
+    this.log.info(`Successfully grouped artifacts; artifacts.length=${artifacts.length}`);
     return AdapterResult.create({
       id: outputId,
       type: "directory",

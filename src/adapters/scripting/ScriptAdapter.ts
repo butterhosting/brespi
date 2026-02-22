@@ -7,8 +7,10 @@ import { readdir, rename, rm } from "fs/promises";
 import { basename, dirname, join } from "path";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
+import { Logger } from "@/Logger";
 
 export class ScriptAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   public constructor(
     protected readonly env: Env.Private,
     protected readonly propertyResolver: PropertyResolver,
@@ -19,20 +21,29 @@ export class ScriptAdapter extends AbstractAdapter {
   public async execute(artifacts: Artifact[], step: Step.CustomScript): Promise<AdapterResult> {
     const scriptPath = this.resolveString(step.path);
     if (step.passthrough) {
+      this.log.debug(`Executing script in passthrough mode; scriptPath=${scriptPath}`);
       await this.executeScript(scriptPath);
+
+      this.log.info(`Successfully executed script in passthrough mode; scriptPath=${scriptPath}`);
       return AdapterResult.create(artifacts);
     }
+    this.log.debug(`Preparing to execute script; scriptPath=${scriptPath}, artifacts.length=${artifacts.length}`);
     const [artifactsIn, artifactsOut] = await Promise.all([
       this.createTmpDestination(), //
       this.createTmpDestination(),
     ]);
     try {
+      this.log.debug(`Moving artifacts to input directory; artifacts.length=${artifacts.length}`);
       await this.moveArtifacts(artifacts, artifactsIn);
+      this.log.debug(`Executing script; scriptPath=${scriptPath}`);
       await this.executeScript(scriptPath, {
         BRESPI_ARTIFACTS_IN: artifactsIn,
         BRESPI_ARTIFACTS_OUT: artifactsOut,
       });
-      return AdapterResult.create(await this.readArtifactsFromDirectory(artifactsOut));
+      const outputArtifacts = await this.readArtifactsFromDirectory(artifactsOut);
+
+      this.log.info(`Successfully executed script; scriptPath=${scriptPath}, input.length=${artifacts.length}, output.length=${outputArtifacts.length}`);
+      return AdapterResult.create(outputArtifacts);
     } finally {
       await Promise.all([
         rm(artifactsIn, { recursive: true, force: true }), //

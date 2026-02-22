@@ -38,16 +38,16 @@ export class AdapterService {
         return await filesystemAdapter.write(artifacts, options, trail);
       },
       [Step.Type.compression]: async (artifacts, options) => {
-        return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => compressionAdapter.compress(a, options)));
+        return await compressionAdapter.compressAll(artifacts, options);
       },
       [Step.Type.decompression]: async (artifacts, options) => {
-        return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => compressionAdapter.decompress(a, options)));
+        return await compressionAdapter.decompressAll(artifacts, options);
       },
       [Step.Type.encryption]: async (artifacts, options) => {
-        return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => encryptionAdapter.encrypt(a, options)));
+        return await encryptionAdapter.encryptAll(artifacts, options);
       },
       [Step.Type.decryption]: async (artifacts, options) => {
-        return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => encryptionAdapter.decrypt(a, options)));
+        return await encryptionAdapter.decryptAll(artifacts, options);
       },
       [Step.Type.folder_flatten]: async (artifacts, options) => {
         return await filesystemAdapter.folderFlatten(artifacts, options);
@@ -88,13 +88,5 @@ export class AdapterService {
       throw new Error(`Unknown step type: ${step.type}`);
     }
     return await handler(artifacts, step, trail);
-  }
-
-  private async spreadAndCollect(artifacts: Artifact[], fn: (artifact: Artifact) => Promise<Artifact>) {
-    const result: Artifact[] = [];
-    for (const artifact of artifacts) {
-      result.push(await fn(artifact));
-    }
-    return result;
   }
 }

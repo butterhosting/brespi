@@ -6,8 +6,11 @@ import { Step } from "@/models/Step";
 import { readdir, rename, rm } from "fs/promises";
 import { basename, dirname, join } from "path";
 import { AbstractAdapter } from "../AbstractAdapter";
+import { Logger } from "@/Logger";
+import { AdapterResult } from "../AdapterResult";
 
 export class CompressionAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   private readonly EXTENSION = ".tar.gz";
 
   public constructor(
@@ -15,6 +18,14 @@ export class CompressionAdapter extends AbstractAdapter {
     protected readonly propertyResolver: PropertyResolver,
   ) {
     super(env, propertyResolver);
+  }
+
+  public async compressAll(artifacts: Artifact[], step: Step.Compression): Promise<AdapterResult> {
+    return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => this.compress(a, step)));
+  }
+
+  public async decompressAll(artifacts: Artifact[], step: Step.Decompression): Promise<AdapterResult> {
+    return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => this.decompress(a, step)));
   }
 
   /**
@@ -31,6 +42,7 @@ export class CompressionAdapter extends AbstractAdapter {
    *   rm archive.tar
    */
   public async compress(artifact: Artifact, step: Step.Compression): Promise<Artifact> {
+    this.log.debug(`Preparing to compress; artifact=${artifact.name}, level=${step.algorithm.level}`);
     const inputPath = artifact.path;
     const { outputId, outputPath } = this.generateArtifactDestination();
     const intermediatePath = `${outputPath}.tar`;
@@ -40,15 +52,19 @@ export class CompressionAdapter extends AbstractAdapter {
         COPYFILE_DISABLE: "1", // Prevents macOS tar from creating ._* AppleDouble files
       };
       // Create intermediate (uncompressed) tar
+      this.log.debug(`Creating intermediate tar; artifact=${artifact.name}`);
       await this.runCommand({
         cmd: ["tar", "-cf", intermediatePath, "-C", dirname(inputPath), basename(inputPath)],
         env,
       });
       // Compress with explicit level (output to stdout, redirect to file via shell)
+      this.log.debug(`Compressing with gzip; artifact=${artifact.name}, level=${step.algorithm.level}`);
       await this.runCommand({
         cmd: ["sh", "-c", `gzip -${step.algorithm.level} -c "${intermediatePath}" > "${outputPath}"`],
         env,
       });
+
+      this.log.info(`Successfully compressed; artifact=${artifact.name}, level=${step.algorithm.level}`);
       return {
         id: outputId,
         type: "file",
@@ -75,9 +91,11 @@ export class CompressionAdapter extends AbstractAdapter {
    */
   public async decompress(artifact: Artifact, step: Step.Decompression): Promise<Artifact> {
     this.requireArtifactType("file", artifact);
+    this.log.debug(`Preparing to decompress; artifact=${artifact.name}`);
     const inputPath = artifact.path;
     const tempPath = await this.createTmpDestination();
     try {
+      this.log.debug(`Extracting archive; artifact=${artifact.name}`);
       await this.runCommand({
         cmd: ["tar", "-xzf", inputPath, "-C", tempPath],
       });
@@ -88,6 +106,8 @@ export class CompressionAdapter extends AbstractAdapter {
 
       const stats = await this.requireFilesystemExistence(outputPath);
       const name = this.stripExtension(artifact.name, this.EXTENSION);
+
+      this.log.info(`Successfully decompressed; artifact=${artifact.name}, outputType=${stats.type}`);
       return {
         id: outputId,
         type: stats.type,

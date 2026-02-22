@@ -6,9 +6,12 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypt
 import { createReadStream, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { AbstractAdapter } from "../AbstractAdapter";
+import { AdapterResult } from "../AdapterResult";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
+import { Logger } from "@/Logger";
 
 export class EncryptionAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   private readonly EXTENSION = ".enc";
 
   public constructor(
@@ -18,11 +21,20 @@ export class EncryptionAdapter extends AbstractAdapter {
     super(env, propertyResolver);
   }
 
+  public async encryptAll(artifacts: Artifact[], step: Step.Encryption): Promise<AdapterResult> {
+    return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => this.encrypt(a, step)));
+  }
+
+  public async decryptAll(artifacts: Artifact[], step: Step.Decryption): Promise<AdapterResult> {
+    return AdapterResult.create(await this.spreadAndCollect(artifacts, (a) => this.decrypt(a, step)));
+  }
+
   public async encrypt(artifact: Artifact, step: Step.Encryption): Promise<Artifact> {
     this.requireArtifactType("file", artifact);
     const key = this.resolveString(step.key);
     const algorithm = this.translateAlgorithm(step.algorithm.implementation);
 
+    this.log.debug(`Preparing to encrypt; artifact=${artifact.name}, algorithm=${algorithm}`);
     const inputPath = artifact.path;
     const { outputId, outputPath } = this.generateArtifactDestination();
 
@@ -35,6 +47,8 @@ export class EncryptionAdapter extends AbstractAdapter {
       const outputStream = createWriteStream(outputPath);
       outputStream.write(iv);
       await pipeline(createReadStream(inputPath), cipher, outputStream);
+
+      this.log.info(`Successfully encrypted; artifact=${artifact.name}, algorithm=${algorithm}`);
       return {
         id: outputId,
         type: "file",
@@ -51,6 +65,7 @@ export class EncryptionAdapter extends AbstractAdapter {
     const key = this.resolveString(step.key);
     const algorithm = this.translateAlgorithm(step.algorithm.implementation);
 
+    this.log.debug(`Preparing to decrypt; artifact=${artifact.name}, algorithm=${algorithm}`);
     const inputPath = artifact.path;
     const { outputId, outputPath } = this.generateArtifactDestination();
 
@@ -72,6 +87,8 @@ export class EncryptionAdapter extends AbstractAdapter {
       });
       const decipher = createDecipheriv(algorithm, keyBuffer, iv);
       await pipeline(inputStream, decipher, createWriteStream(outputPath));
+
+      this.log.info(`Successfully decrypted; artifact=${artifact.name}, algorithm=${algorithm}`);
       return {
         id: outputId,
         type: "file",

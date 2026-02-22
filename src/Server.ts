@@ -266,15 +266,17 @@ export class Server {
        */
       error: (e) => this.handleError(e),
     });
-    this.log.info(
+
+    // ordinary log, so this is always printed (independent of log level)
+    console.log(
       [
-        "",
         "",
         `  🚀 \x1b[1mBrespi started on ${Prettify.timestamp(Temporal.Now.plainDateTimeISO())} (${Temporal.Now.timeZoneId()})\x1b[0m`,
         "",
         `  \x1b[1mStage\x1b[0m     ${this.env.O_BRESPI_STAGE}`,
         `  \x1b[1mVersion\x1b[0m   ${this.env.O_BRESPI_VERSION}`,
         `  \x1b[1mCommit\x1b[0m    ${this.env.O_BRESPI_COMMIT}`,
+        `  \x1b[1mLoglevel\x1b[0m  ${this.env.X_BRESPI_LOGLEVEL}`,
         `  \x1b[1mServer\x1b[0m    ${server.url}`,
         "",
       ].join("\n"),

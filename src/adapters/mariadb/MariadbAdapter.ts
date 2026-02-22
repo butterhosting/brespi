@@ -9,8 +9,10 @@ import { z } from "zod/v4";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
+import { Logger } from "@/Logger";
 
 export class MariadbAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   private readonly EXTENSION = ".sql";
 
   public constructor(
@@ -23,6 +25,7 @@ export class MariadbAdapter extends AbstractAdapter {
   public async backup(step: Step.MariadbBackup): Promise<AdapterResult> {
     const { user, password, host, port } = this.resolveConnection(step.connection);
     const { toolkit } = step;
+    this.log.debug(`Preparing to backup; selectionMode=${step.databaseSelection.method}, toolkitResolution=${toolkit.resolution}`);
     const tempDir = await this.createTmpDestination();
     try {
       const scriptPath = join(import.meta.dir, "mariadb_backup.sh");
@@ -72,6 +75,8 @@ export class MariadbAdapter extends AbstractAdapter {
         })
         .parse(JSON.parse(stdout));
       // All databases in output are successful (script fails on first error)
+      const databaseNames = output.databases.map((db) => db.name).join(",");
+      this.log.debug(`Processing backup output; databases=${databaseNames}`);
       const artifacts: Artifact[] = [];
       for (const db of output.databases) {
         const { outputId, outputPath } = this.generateArtifactDestination();
@@ -83,6 +88,8 @@ export class MariadbAdapter extends AbstractAdapter {
           name: this.addExtension(db.name, this.EXTENSION),
         });
       }
+
+      this.log.info(`Successfully backed up databases; databases=${databaseNames}`);
       return AdapterResult.create(artifacts, output.runtime);
     } catch (e) {
       throw this.mapError(e, ExecutionError.mariadb_backup_failed);
@@ -97,6 +104,8 @@ export class MariadbAdapter extends AbstractAdapter {
     this.requireArtifactType("file", artifact);
     const { user, password, host, port } = this.resolveConnection(step.connection);
     const { toolkit } = step;
+    const database = this.resolveString(step.database);
+    this.log.debug(`Preparing to restore; database=${database}, toolkitResolution=${toolkit.resolution}`);
     try {
       const { stdout } = await this.runCommand({
         cmd: ["bash", join(import.meta.dir, "mariadb_restore.sh")],
@@ -107,7 +116,7 @@ export class MariadbAdapter extends AbstractAdapter {
           MARIADB_HOST: host,
           MARIADB_PORT: port,
           RESTORE_FILE: artifact.path,
-          DATABASE: this.resolveString(step.database),
+          DATABASE: database,
           ...(toolkit.resolution === "automatic"
             ? { TOOLKIT_RESOLUTION: "automatic" }
             : {
@@ -128,6 +137,8 @@ export class MariadbAdapter extends AbstractAdapter {
           }),
         })
         .parse(JSON.parse(stdout));
+
+      this.log.info(`Successfully restored database; database=${database}`);
       return AdapterResult.create([], output.runtime);
     } catch (e) {
       throw this.mapError(e, ExecutionError.mariadb_restore_failed);

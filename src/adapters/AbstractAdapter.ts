@@ -13,6 +13,14 @@ export abstract class AbstractAdapter {
     protected readonly propertyResolver: PropertyResolver,
   ) {}
 
+  protected async spreadAndCollect(artifacts: Artifact[], fn: (artifact: Artifact) => Promise<Artifact>) {
+    const result: Artifact[] = [];
+    for (const artifact of artifacts) {
+      result.push(await fn(artifact));
+    }
+    return result;
+  }
+
   protected async runCommand(options: CommandRunner.Options) {
     const { exitCode, ...result } = await CommandRunner.run(options);
     if (exitCode !== 0) {

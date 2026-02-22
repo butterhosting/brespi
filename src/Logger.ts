@@ -13,7 +13,7 @@ export class Logger {
   };
 
   public static initialize(env: Env.Private) {
-    this.globalSetting = env.X_BRESPI_LOGGING;
+    this.globalSetting = env.X_BRESPI_LOGLEVEL;
   }
 
   private readonly filename: string;

@@ -5,8 +5,10 @@ import { Artifact } from "@/models/Artifact";
 import { Step } from "@/models/Step";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
+import { Logger } from "@/Logger";
 
 export class FilterAdapter extends AbstractAdapter {
+  private readonly log = new Logger(__filename);
   public constructor(
     protected readonly env: Env.Private,
     protected readonly propertyResolver: PropertyResolver,
@@ -16,6 +18,7 @@ export class FilterAdapter extends AbstractAdapter {
   }
 
   public async filter(artifacts: Artifact[], { filterCriteria }: Step.Filter): Promise<AdapterResult> {
+    this.log.debug(`Preparing to filter artifacts; method=${filterCriteria.method}, artifacts.length=${artifacts.length}`);
     // Resolve strings in filter criteria
     const resolvedCriteria: Step.FilterCriteria =
       filterCriteria.method === "exact"
@@ -25,6 +28,9 @@ export class FilterAdapter extends AbstractAdapter {
           : { method: "regex", nameRegex: this.resolveString(filterCriteria.nameRegex) };
 
     const { predicate } = this.filterCapability.createPredicate(resolvedCriteria);
-    return AdapterResult.create(artifacts.filter(predicate));
+    const result = artifacts.filter(predicate);
+
+    this.log.info(`Successfully filtered artifacts; method=${filterCriteria.method}, input.length=${artifacts.length}, output.length=${result.length}`);
+    return AdapterResult.create(result);
   }
 }

@@ -9,14 +9,11 @@ export namespace Env {
   const baseEnv = z.object({
     O_BRESPI_STAGE: z.enum(["development", "e2etest", "production"]),
     X_BRESPI_ROOT: z.string(),
-    X_BRESPI_LOGGING: z.enum(LogLevel).default(LogLevel.info),
-    X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: z
-      .string()
-      .default("UTC")
-      .refine((tz) => TimeZone.check(tz), {
-        error: "invalid_timezone",
-      }),
-    X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: z.enum(["true", "false"]).default("false"),
+    X_BRESPI_LOGLEVEL: z.enum(LogLevel),
+    X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: z.string().refine((tz) => TimeZone.check(tz), {
+      error: "invalid_timezone",
+    }),
+    X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: z.enum(["true", "false"]),
   });
   export function initialize(timezone = Temporal.Now.timeZoneId() as "UTC", environment = Bun.env as z.output<typeof baseEnv>) {
     if (timezone !== "UTC") {
