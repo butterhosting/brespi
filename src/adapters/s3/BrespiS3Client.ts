@@ -22,11 +22,16 @@ export class BrespiS3Client extends BunS3Client {
     const keys: string[] = [];
     let startAfter: string | undefined;
     while (true) {
-      const response = await this.list({
-        prefix,
-        maxKeys: batchSize,
-        ...(startAfter ? { startAfter } : {}),
-      });
+      let response;
+      try {
+        response = await this.list({
+          prefix,
+          maxKeys: batchSize,
+          ...(startAfter ? { startAfter } : {}),
+        });
+      } catch (e) {
+        throw new Error(`Failed to list bucket keys; bucket=${this.options.bucket}, prefix=${prefix}`);
+      }
       const newKeys = (response.contents || []).map(({ key }) => key);
       keys.push(...newKeys);
       if (response.isTruncated) {
@@ -35,7 +40,7 @@ export class BrespiS3Client extends BunS3Client {
           startAfter = lastKey;
           continue;
         } else {
-          throw new Error(`Invalid state; S3 list was truncated, but returned no keys`);
+          throw new Error(`S3 list was truncated, but returned no keys; bucket=${this.options.bucket}, prefix=${prefix}`);
         }
       }
       break;
