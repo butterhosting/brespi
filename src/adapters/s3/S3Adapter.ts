@@ -142,13 +142,21 @@ export class S3Adapter extends AbstractAdapter {
 
   private createReadWriteFns(client: S3Client): ManagedStorageCapability.ReadWriteFns {
     return {
-      async writeFn(item: { path: string; content: string }) {
+      writeFn: async (item: { path: string; content: string }) => {
         await client.write(item.path, item.content);
       },
-      async readFn(path: string) {
-        const file = client.file(path);
-        const exists = await file.exists();
-        return exists ? await file.text() : undefined;
+      readFn: async (path: string) => {
+        try {
+          this.log.debug("A");
+          const file = client.file(path);
+          this.log.debug("B");
+          const exists = await file.exists();
+          this.log.debug("C");
+          return exists ? await file.text() : undefined;
+        } catch (e) {
+          this.log.debug("E", e);
+          throw e;
+        }
       },
     };
   }
