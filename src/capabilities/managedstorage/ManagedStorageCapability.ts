@@ -64,8 +64,10 @@ export class ManagedStorageCapability {
     try {
       const mfPath = join(base, Manifest.NAME);
       const mfFile = await readFn(mfPath);
+      this.log.debug(`Read manifest; path=${mfPath}`);
+
       const existingMf: Manifest = mfFile === undefined ? Manifest.empty() : this.parseManifest(mfFile);
-      this.log.debug(`Read manifest; base=${base}, existingItems.length=${existingMf.items.length}`);
+      this.log.debug(`Parsed manifest; base=${base}, existingItems.length=${existingMf.items.length}`);
 
       const version = await this.waitForAvailableTimestamp(existingMf);
       listingDetails = createListingDetails(version);
