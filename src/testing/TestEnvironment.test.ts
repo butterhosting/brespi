@@ -6,7 +6,9 @@ import { initializeSqlite, Sqlite } from "@/drizzle/sqlite";
 import { Env } from "@/Env";
 import { EventBus } from "@/events/EventBus";
 import { TempDestination } from "@/helpers/TempDestination";
+import { Logger } from "@/Logger";
 import { Artifact } from "@/models/Artifact";
+import { LogLevel } from "@/models/LogLevel";
 import { ConfigurationRepository } from "@/repositories/ConfigurationRepository";
 import { ExecutionRepository } from "@/repositories/ExecutionRepository";
 import { NotificationRepository } from "@/repositories/NotificationRepository";
@@ -96,9 +98,13 @@ export namespace TestEnvironment {
     const env = Env.initialize("UTC", {
       O_BRESPI_STAGE: "development",
       X_BRESPI_ROOT: join(unitTestRoot, "brespi"),
+      X_BRESPI_LOGGING: LogLevel.debug,
       X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: "UTC",
       X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: "false",
     });
+
+    // Initialize the logger
+    Logger.initialize(env);
 
     // Setup filesystem
     const scratchpad = join(unitTestRoot, "scratchpad");

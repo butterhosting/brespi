@@ -3,11 +3,13 @@ import { isAbsolute, join } from "path";
 import { z } from "zod/v4";
 import { TimeZone } from "./helpers/TimeZone";
 import packageJson from "../package.json";
+import { LogLevel } from "./models/LogLevel";
 
 export namespace Env {
   const baseEnv = z.object({
-    X_BRESPI_ROOT: z.string(),
     O_BRESPI_STAGE: z.enum(["development", "e2etest", "production"]),
+    X_BRESPI_ROOT: z.string(),
+    X_BRESPI_LOGGING: z.enum(LogLevel).default(LogLevel.info),
     X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: z
       .string()
       .default("UTC")

@@ -6,11 +6,17 @@ import { ConfigurationRepository } from "./repositories/ConfigurationRepository"
 import { Server } from "./Server";
 import { ServerRegistry } from "./ServerRegistry";
 import { CleanupService } from "./services/CleanupService";
+import { Logger } from "./Logger";
 
 /**
  * Initialize the env configuration
  */
 const env = Env.initialize();
+
+/**
+ * Initialize the logger
+ */
+Logger.initialize(env);
 
 /**
  * Create the main directories

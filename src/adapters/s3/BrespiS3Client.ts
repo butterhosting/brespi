@@ -4,7 +4,7 @@ import { S3Client as AWSS3Client, DeleteObjectsCommand } from "@aws-sdk/client-s
 export class BrespiS3Client extends BunS3Client {
   private readonly awsClient: AWSS3Client;
 
-  public constructor(private readonly options: Bun.S3Options) {
+  public constructor(public readonly options: Bun.S3Options) {
     super(options);
     this.awsClient = new AWSS3Client({
       endpoint: options.endpoint,
