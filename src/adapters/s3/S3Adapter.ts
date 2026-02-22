@@ -143,19 +143,19 @@ export class S3Adapter extends AbstractAdapter {
   private createReadWriteFns(client: S3Client): ManagedStorageCapability.ReadWriteFns {
     return {
       writeFn: async (item: { path: string; content: string }) => {
-        await client.write(item.path, item.content);
+        try {
+          await client.write(item.path, item.content);
+        } catch (e) {
+          throw new Error(`Failed to write S3 file; path=${item.path}, details=${String(e)}`);
+        }
       },
       readFn: async (path: string) => {
         try {
-          this.log.debug("A");
           const file = client.file(path);
-          this.log.debug("B");
           const exists = await file.exists();
-          this.log.debug("C");
           return exists ? await file.text() : undefined;
         } catch (e) {
-          this.log.debug("E", e);
-          throw e;
+          throw new Error(`Failed to read S3 file; path=${path}, details=${String(e)}`);
         }
       },
     };
