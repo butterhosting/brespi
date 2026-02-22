@@ -16,6 +16,7 @@ export function configurationPage() {
   const client = useRegistry(ConfigurationClient);
   const { O_BRESPI_CONFIGURATION } = useRegistry("env");
 
+  const [copyTimeoutToken, setCopyTimeoutToken] = useState<number>();
   const [busy, setBusy] = useState(false);
   const handleChanges = async (operation: "save" | "discard") => {
     try {
@@ -35,6 +36,10 @@ export function configurationPage() {
     if (query.data) {
       const json = JSON.stringify(query.data.coreConfiguration);
       await navigator.clipboard.writeText(json);
+      setCopyTimeoutToken((currentToken) => {
+        window.clearTimeout(currentToken);
+        return window.setTimeout(() => setCopyTimeoutToken(undefined), 1000);
+      });
     }
   };
   return (
@@ -58,7 +63,10 @@ export function configurationPage() {
                 Copy current configuration
               </Button>
             </div>
-            <JsonPreview className="mt-2" data={query.data.coreConfiguration} maxLines={8} />
+            <div className="relative">
+              {copyTimeoutToken && <span className="absolute top-4 right-5 text-sm text-c-success z-10">Copied!</span>}
+              <JsonPreview className="mt-2" data={query.data.coreConfiguration} maxLines={8} />
+            </div>
           </div>
         ) : (
           <div>
@@ -78,7 +86,10 @@ export function configurationPage() {
                 Copy current configuration
               </Button>
             </div>
-            <JsonPreview className="mt-2" data={query.data.coreConfiguration} maxLines={8} />
+            <div className="relative">
+              {copyTimeoutToken && <span className="absolute top-4 right-5 text-sm text-c-success z-10">Copied!</span>}
+              <JsonPreview className="mt-2" data={query.data.coreConfiguration} maxLines={8} />
+            </div>
           </div>
         )}
       </Paper>
