@@ -5,7 +5,12 @@ import { FormHelper } from "../FormHelper";
 import { useEffect } from "react";
 
 const { summary, Field, Label, Description } = FormHelper.meta({
-  summary: "Used for downloading file artifacts from S3-compatible storage.",
+  summary: (
+    <>
+      Used for downloading file artifacts from S3-compatible storage. Requires the <FormElements.Code break>s3:GetObject</FormElements.Code>{" "}
+      permission (or equivalent).
+    </>
+  ),
   fields: {
     connection_format: {
       label: "Connection: format",

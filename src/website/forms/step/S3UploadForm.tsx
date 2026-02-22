@@ -5,7 +5,25 @@ import { FormHelper } from "../FormHelper";
 import { useEffect } from "react";
 
 const { summary, Field, Label, Description } = FormHelper.meta({
-  summary: "Used for uploading file artifacts to S3-compatible storage.",
+  summary: (
+    <>
+      <p>Used for uploading file artifacts to S3-compatible storage. Requires the following permissions (or equivalent):</p>
+      <ul className="ml-2 list-disc list-inside">
+        <li>
+          <FormElements.Code break>s3:GetObject</FormElements.Code>
+        </li>
+        <li>
+          <FormElements.Code break>s3:PutObject</FormElements.Code>
+        </li>
+        <li>
+          <FormElements.Code break>s3:DeleteObject</FormElements.Code>
+        </li>
+        <li>
+          <FormElements.Code break>s3:ListBucket</FormElements.Code>
+        </li>
+      </ul>
+    </>
+  ),
   fields: {
     connection_format: {
       label: "Connection: format",
