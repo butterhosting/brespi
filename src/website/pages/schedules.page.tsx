@@ -125,8 +125,8 @@ export function schedulesPage() {
             <div className={clsx(gridClassName, "border-none rounded-t-2xl bg-[rgb(20,20,20)] text-lg")}>
               <label htmlFor={ScheduleEditor.Field.active}>Active</label>
               <label htmlFor={ScheduleEditor.Field.pipelineId}>Pipeline</label>
-              <label htmlFor={ScheduleEditor.Field.cron}>Cron</label>
-              <div>Next?</div>
+              <label htmlFor={ScheduleEditor.Field.cron}>Cron (UTC)</label>
+              <div>Next? (Local time)</div>
               <div />
             </div>
             {editing === "new" ? (
