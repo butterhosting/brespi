@@ -43,7 +43,12 @@ export default defineConfig({
 
   /* Build and start the production image before running tests */
   webServer: {
-    command: "./brespi.sh image create --postgresql --mariadb --stage e2e && docker compose -f compose-e2e.yaml up",
+    command: [
+      "./brespi.sh image create --postgresql --mariadb --stage e2e",
+      process.env.CI
+        ? `HOST_UID=${process.getuid!()} HOST_GID=${process.getgid!()} docker compose -f compose-e2e.yaml up`
+        : "docker compose -f compose-e2e.yaml up",
+    ].join(" && "),
     stdout: "pipe",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
