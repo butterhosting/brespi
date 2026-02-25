@@ -139,16 +139,32 @@ EOF
             printf "RUN apk add --no-cache mariadb-client\n" >> "$tmpfile"
         fi
 
-        # Since we don't have `bash`, this is the `sh` way of checking if a string starts with forward slash
-        # (i.e.: checking if it's an absolute path)
+        # Check if brespi_root is an absolute path
         case "$brespi_root" in
-            /*) printf "RUN mkdir -p %s && chown bun:bun %s\n" "$brespi_root" "$brespi_root" >> "$tmpfile" ;;
+            /*) is_absolute=true ;;
+            *) is_absolute=false ;;
         esac
 
-        cat >> "$tmpfile" <<EOF
+        if [ "$is_absolute" = true ]; then
+            printf "RUN apk add --no-cache su-exec\n" >> "$tmpfile"
+            printf "RUN mkdir -p %s && chown bun:bun %s\n" "$brespi_root" "$brespi_root" >> "$tmpfile"
+            cat >> "$tmpfile" <<ENTRY_EOF
+RUN printf '#!/bin/sh\nchown -R bun:bun ${brespi_root}\nexec su-exec bun "\$@"\n' > /entrypoint.sh && chmod +x /entrypoint.sh
+ENTRY_EOF
+        fi
+
+        cat >> "$tmpfile" <<'EOF'
 WORKDIR /app
 COPY --from=builder --chown=bun:bun /app .
-USER bun
+EOF
+
+        if [ "$is_absolute" = true ]; then
+            printf 'ENTRYPOINT ["/entrypoint.sh"]\n' >> "$tmpfile"
+        else
+            printf "USER bun\n" >> "$tmpfile"
+        fi
+
+        cat >> "$tmpfile" <<EOF
 EXPOSE 3000
 CMD ["bun", "start:${stage}"]
 EOF
