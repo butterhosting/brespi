@@ -1,0 +1,21 @@
+services:
+  # Creates root-owned directories in the volume before brespi starts.
+  # This simulates a real deployment where bind mounts or pre-existing
+  # volumes are owned by root — the scenario where the entrypoint's
+  # chown is actually needed.
+  init:
+    image: alpine
+    volumes:
+      - brespi:/opt/brespi
+    command: ["sh", "-c", "mkdir -p /opt/brespi/data /opt/brespi/tmp"]
+
+  brespi:
+    image: brespi:latest
+    volumes:
+      - brespi:/opt/brespi
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+volumes:
+  brespi:
