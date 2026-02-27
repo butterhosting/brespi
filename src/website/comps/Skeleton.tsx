@@ -70,9 +70,12 @@ export namespace Skeleton {
     const seed = () => restrictedClient.seed().then(() => location.reload());
     return (
       <footer className="u-root-grid-minus-gutters my-12 flex flex-col items-center gap-4">
-        <div className="text-4xl font-extrabold italic text-c-dark">Brespi</div>
-        <div className="font-mono font-extralight text-c-dim/60">
-          v{O_BRESPI_VERSION} / {O_BRESPI_COMMIT.slice(0, 7)}
+        <div className="text-4xl font-extrabold italic text-c-dark pr-5">Brespi</div>
+        <div className="italic text-c-dark -mt-3 pl-5">
+          by{" "}
+          <a href="https://www.butterhost.ing" target="_blank" rel="nooopener noreferrer" className="text-c-accent hover:text-c-dark">
+            Butterhost.ing
+          </a>
         </div>
         {O_BRESPI_STAGE === "development" && (
           <div className="flex gap-4">

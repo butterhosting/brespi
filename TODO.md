@@ -55,9 +55,9 @@
 ### Distribution
 * ✅ Automatically include the application version
 * ✅ Create a shell script for building docker images with the appropriate toolset (only requirements: sh + git + docker)
-* Write a README.md, CONTRIBUTING.md and LICENSE.md
-* Add a footer link
+* ✅ Write a README.md, CONTRIBUTING.md and LICENSE.md
+* ✅ Add a footer link
 
 ### Marketing
+* ✅ Move this repository to a different org
 * Create an accompanying landing page, with how it works, how to use, and how to configure (no exhaustive documentation)
-* Move this repository to a different org
