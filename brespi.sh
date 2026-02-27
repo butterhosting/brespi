@@ -111,7 +111,7 @@ cmd_image_create() {
     cat > "$tmpfile" <<'EOF'
 FROM oven/bun:alpine AS builder
 WORKDIR /app
-COPY package.json bun.lock* tsconfig.json bunfig.toml bun-env.d.ts drizzle.config.ts .env.dev .env.e2e .env.prod ./
+COPY package.json bun.lock* tsconfig.json bunfig.toml bun-env.d.ts drizzle.config.ts .env.* ./
 ARG BRESPI_VERSION
 ARG BRESPI_COMMIT
 RUN bun -e "const p='./package.json'; const j=await Bun.file(p).json(); j.version='$BRESPI_VERSION'; j.commit='$BRESPI_COMMIT'; await Bun.write(p, JSON.stringify(j, null, 2))"
@@ -169,6 +169,7 @@ EXPOSE 3000
 CMD ["bun", "start:${stage}"]
 EOF
     fi
+    printf "____________________\n%s\n--------------------\n" "$(cat $tmpfile)"
 
     tag="brespi:${version}"
     old_image_id=$(docker images -q "$tag" 2>/dev/null || true)
