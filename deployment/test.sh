@@ -23,6 +23,20 @@ teardown() {
     active_compose=""
 }
 
+build_image() {
+    label="$1"
+    shift
+    printf "\n  BUILD %s\n" "$label"
+    build_log=$(mktemp)
+    if ! ./brespi.sh image create "$@" >"$build_log" 2>&1; then
+        cat "$build_log"
+        printf "  FAIL  %s (image build failed)\n" "$label"
+        rm -f "$build_log"
+        exit 1
+    fi
+    rm -f "$build_log"
+}
+
 assert_status() {
     expected="$1"
     shift
@@ -104,18 +118,15 @@ verify_auth() {
 
 cd "$ROOT"
 
-printf "\nBuilding default image...\n"
-./brespi.sh image create --postgresql --mariadb
+build_image "default" --postgresql --mariadb
 run_scenario "default" "$SCRIPT_DIR/compose.yaml" verify_no_auth
 run_scenario "default-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
-printf "\nBuilding custom-alpine image...\n"
-./brespi.sh image create --dockerfile "$SCRIPT_DIR/custom-alpine.Dockerfile"
+build_image "custom-alpine" --dockerfile "$SCRIPT_DIR/custom-alpine.Dockerfile"
 run_scenario "custom-alpine" "$SCRIPT_DIR/compose.yaml" verify_no_auth
 run_scenario "custom-alpine-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
-printf "\nBuilding custom-ubuntu image...\n"
-./brespi.sh image create --dockerfile "$SCRIPT_DIR/custom-ubuntu.Dockerfile"
+build_image "custom-ubuntu" --dockerfile "$SCRIPT_DIR/custom-ubuntu.Dockerfile"
 run_scenario "custom-ubuntu" "$SCRIPT_DIR/compose.yaml" verify_no_auth
 run_scenario "custom-ubuntu-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
