@@ -39,8 +39,8 @@ jobs:
       - name: "Application :: Regression Tests"
         run: bun test:regression
 
-      - name: "Application :: E2E Tests"
-        run: bun e2e:headless
-
       - name: "Application :: Deployment Tests"
         run: bun test:deployment
+
+      - name: "Application :: E2E Tests"
+        run: bun e2e:headless

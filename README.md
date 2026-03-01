@@ -1,4 +1,4 @@
-# Brespi: A Visual Backup-n-Restore Pipeline Builder
+# Brespi: Backup-and-Restore Pipelines for Self-Hosters
 
 ![backup pipeline containing steps for backing up postgresql, compression, encryption and uploading to S3](.readme/hero.png)
 

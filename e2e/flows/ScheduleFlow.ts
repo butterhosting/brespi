@@ -11,7 +11,7 @@ export namespace ScheduleFlow {
     page.getByRole("button", { name: "New Schedule ...", exact: true }).click();
     await page.getByLabel("Active").setChecked(active, { force: true }); // Force, because it's hidden (opaque)
     await page.getByLabel("Pipeline").selectOption(pipelineName);
-    await page.getByLabel("Cron (UTC)").fill(cron);
+    await page.getByLabel("Cron").fill(cron);
     await submitSave(page);
   }
 

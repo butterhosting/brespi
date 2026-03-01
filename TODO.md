@@ -46,6 +46,7 @@
 * ✅ Refactor so the backend ALWAYS uses TZ=UTC for it's PlainDateTime objects ... but provide an environment option BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE with a default of UTC (if people wanna see their versions in a particular timestamp) --- but the internal default for PlainDateTime should be UTC always
 * ✅ Check if the `*Converter` classes can be made part of the Drizzle entity definition
 * ✅ Allow env var references on all text fields via the ${...} syntax (on the right side; give an overview of detected env vars in orange; this also requires updating descriptions)
+* Implement a top-level `schema` number on the configuration object
 * Upgrade all dependencies
 
 ### Polish
@@ -57,6 +58,7 @@
 * ✅ Create a shell script for building docker images with the appropriate toolset (only requirements: sh + git + docker)
 * ✅ Write a README.md, CONTRIBUTING.md and LICENSE.md
 * ✅ Add a footer link
+* Publish v1.0.0 and delete this file
 
 ### Marketing
 * ✅ Move this repository to a different org

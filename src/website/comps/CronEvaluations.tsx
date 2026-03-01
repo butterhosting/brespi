@@ -8,8 +8,9 @@ import { Temporal } from "@js-temporal/polyfill";
 type Props = {
   className?: string;
   expression: string;
+  timezone: "utc" | "local";
 };
-export function CronEvaluations({ className, expression }: Props) {
+export function CronEvaluations({ className, expression, timezone }: Props) {
   expression = expression.trim();
   const scheduleClient = useRegistry(ScheduleClient);
   const [evaluations, setEvaluations] = useState<Temporal.PlainDateTime[]>([]);
@@ -39,9 +40,9 @@ export function CronEvaluations({ className, expression }: Props) {
 
     const token = setInterval(() => {
       if (cancelled) return;
-      const now = Temporal.Now.plainDateTimeISO();
+      const nowUtc = Temporal.Now.zonedDateTimeISO("UTC").toPlainDateTime();
       setEvaluations((current) => {
-        const filtered = current.filter((e) => Temporal.PlainDateTime.compare(e, now) > 0);
+        const filtered = current.filter((e) => Temporal.PlainDateTime.compare(e, nowUtc) > 0);
         if (filtered.length > 0 && filtered.length < 8) {
           fetchBatch();
         }
@@ -55,6 +56,16 @@ export function CronEvaluations({ className, expression }: Props) {
     };
   }, [expression]);
 
+  const alterTimezone = (timestamp: Temporal.PlainDateTime): Temporal.PlainDateTime => {
+    if (timezone === "local") {
+      return timestamp
+        .toZonedDateTime("UTC") // We know the received timestamp is already in UTC
+        .withTimeZone(Temporal.Now.timeZoneId()) // Convert it to the browser timezone
+        .toPlainDateTime(); // And then we strip the timezone information
+    }
+    return timestamp;
+  };
+
   return (
     <div className={clsx(className, "flex flex-col items-start gap-1")}>
       {evaluations.slice(0, 3).map((nextCronEvaluation, index) => (
@@ -66,7 +77,7 @@ export function CronEvaluations({ className, expression }: Props) {
             fontSize: `${1 - index * 0.07}rem`,
           }}
         >
-          {Prettify.timestamp(nextCronEvaluation)}
+          {Prettify.timestamp(alterTimezone(nextCronEvaluation))}
         </div>
       ))}
     </div>
