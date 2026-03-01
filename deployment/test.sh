@@ -17,9 +17,28 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+teardown() {
+    docker compose -p "$active_project" -f "$active_compose" down -v --timeout 5 >/dev/null 2>&1
+    active_project=""
+    active_compose=""
+}
+
+assert_status() {
+    expected="$1"
+    shift
+    status=$(curl -s -o /dev/null -w "%{http_code}" "$@")
+    if [ "$status" != "$expected" ]; then
+        printf "    FAIL  expected %s, got %s → %s\n" "$expected" "$status" "$*"
+        return 1
+    fi
+    printf "    OK    %s → %s\n" "$expected" "$*"
+    return 0
+}
+
 run_scenario() {
     name="$1"
     compose_file="$2"
+    verify_fn="$3"
     project="brespi-test-${name}"
     active_project="$project"
     active_compose="$compose_file"
@@ -36,11 +55,17 @@ run_scenario() {
 
         if printf "%s" "$logs" | grep -q "Brespi started"; then
             printf "%s\n" "$logs"
-            printf "  PASS  %s\n" "$name"
-            passed=$((passed + 1))
-            docker compose -p "$project" -f "$compose_file" down -v --timeout 5 >/dev/null 2>&1
-            active_project=""
-            active_compose=""
+
+            # Run HTTP verification
+            if $verify_fn; then
+                printf "  PASS  %s\n" "$name"
+                passed=$((passed + 1))
+            else
+                printf "  FAIL  %s (verification failed)\n" "$name"
+                failed=$((failed + 1))
+            fi
+
+            teardown
             return 0
         fi
 
@@ -49,9 +74,7 @@ run_scenario() {
             printf "%s\n" "$logs"
             printf "  FAIL  %s (container exited)\n" "$name"
             failed=$((failed + 1))
-            docker compose -p "$project" -f "$compose_file" down -v --timeout 5 >/dev/null 2>&1
-            active_project=""
-            active_compose=""
+            teardown
             return 1
         fi
 
@@ -62,10 +85,19 @@ run_scenario() {
     docker compose -p "$project" -f "$compose_file" logs brespi 2>&1
     printf "  FAIL  %s (timeout after %ds)\n" "$name" "$TIMEOUT"
     failed=$((failed + 1))
-    docker compose -p "$project" -f "$compose_file" down -v --timeout 5 >/dev/null 2>&1
-    active_project=""
-    active_compose=""
+    teardown
     return 1
+}
+
+# ─── verification functions ───
+
+verify_no_auth() {
+    assert_status "200" http://localhost:3000/api/env
+}
+
+verify_auth() {
+    assert_status "401" http://localhost:3000/api/env \
+        && assert_status "200" -u kim:possible http://localhost:3000/api/env
 }
 
 # ─── scenarios ───
@@ -74,15 +106,18 @@ cd "$ROOT"
 
 printf "\nBuilding default image...\n"
 ./brespi.sh image create --postgresql --mariadb
-run_scenario "default" "$SCRIPT_DIR/compose.yaml"
+run_scenario "default" "$SCRIPT_DIR/compose.yaml" verify_no_auth
+run_scenario "default-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
 printf "\nBuilding custom-alpine image...\n"
 ./brespi.sh image create --dockerfile "$SCRIPT_DIR/custom-alpine.Dockerfile"
-run_scenario "custom-alpine" "$SCRIPT_DIR/compose.yaml"
+run_scenario "custom-alpine" "$SCRIPT_DIR/compose.yaml" verify_no_auth
+run_scenario "custom-alpine-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
 printf "\nBuilding custom-ubuntu image...\n"
 ./brespi.sh image create --dockerfile "$SCRIPT_DIR/custom-ubuntu.Dockerfile"
-run_scenario "custom-ubuntu" "$SCRIPT_DIR/compose.yaml"
+run_scenario "custom-ubuntu" "$SCRIPT_DIR/compose.yaml" verify_no_auth
+run_scenario "custom-ubuntu-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 
 # ─── summary ───
 
