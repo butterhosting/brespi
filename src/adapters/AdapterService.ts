@@ -1,5 +1,8 @@
+import { PropertyExtractor } from "@/capabilities/propertyresolution/PropertyExtractor";
+import { Logger } from "@/Logger";
 import { Artifact } from "@/models/Artifact";
 import { Step } from "@/models/Step";
+import { StepWarning } from "@/models/StepWarning";
 import { StepWithRuntime } from "@/models/StepWithRuntime";
 import { AdapterResult } from "./AdapterResult";
 import { CompressionAdapter } from "./compression/CompressionAdapter";
@@ -18,6 +21,7 @@ type InternalRegistry = {
 };
 
 export class AdapterService {
+  private readonly log = new Logger(__filename);
   private readonly registry: InternalRegistry;
 
   public constructor(
@@ -87,6 +91,18 @@ export class AdapterService {
     if (!handler) {
       throw new Error(`Unknown step type: ${step.type}`);
     }
+    this.detectPlaintextSensitiveFields(step);
     return await handler(artifacts, step, trail);
+  }
+
+  private detectPlaintextSensitiveFields(step: Step): void {
+    for (const dotPath of StepWarning.sensitiveFields(step.type)) {
+      const value = dotPath.split(".").reduce<unknown>((obj, key) => (obj as Record<string, unknown>)?.[key], step);
+      if (typeof value === "string" && !PropertyExtractor.containsReference(value)) {
+        this.log.error(
+          `Step "${step.type}" has a plaintext value for sensitive field "${dotPath}"; please use \${VARIABLE} syntax instead`,
+        );
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ export class Logger {
     [LogLevel.debug]: "🐞",
     [LogLevel.info]: "ℹ️",
     [LogLevel.warn]: "⚠️",
-    [LogLevel.error]: "🛑",
+    [LogLevel.error]: "❌",
   };
 
   public static initialize(env: Env.Private) {
@@ -44,7 +44,7 @@ export class Logger {
   private log = (level: LogLevel, ...args: unknown[]) => {
     if (this.shouldLog(level)) {
       const timestamp = Temporal.Now.plainDateTimeISO().toString({ smallestUnit: "second" }).replace("T", " ");
-      const prefix = `${timestamp} ${Logger.emojis[level]} ${this.filename} |`;
+      const prefix = `${timestamp} [${level.toUpperCase()}] ${Logger.emojis[level]} ${this.filename} |`;
       console[level].call(console, prefix, ...args);
     }
   };
