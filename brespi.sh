@@ -6,6 +6,7 @@ usage() {
     printf "\nCommands:\n"
     printf "  image create [options]    Build a production Docker image\n"
     printf "  version list              List all available versions\n"
+    printf "  hash                      Generate a bcrypt password hash\n"
     printf "\nOptions for 'image create':\n"
     printf "  --postgresql              Include postgresql-client in the image\n"
     printf "  --mariadb                 Include mariadb-client in the image\n"
@@ -186,6 +187,16 @@ EOF
     printf "Created image > %s\n" "$tag"
 }
 
+cmd_hash() {
+    read -s -p "Enter password: " password
+    printf "\n"
+    echo "$password" | docker run --rm -i oven/bun:alpine bun -e "
+        const password = (await Bun.stdin.text()).trim();
+        const hash = await Bun.password.hash(password, { algorithm: 'bcrypt' });
+        console.info(hash);
+    "
+}
+
 cmd_version_list() {
     git --no-pager tag --sort=-version:refname 2>/dev/null || true
     printf "0.0.0\n"
@@ -210,6 +221,9 @@ case "$command" in
         fi
         shift
         cmd_image_create "$@"
+        ;;
+    hash)
+        cmd_hash
         ;;
     version)
         if [ $# -lt 1 ] || [ "$1" != "list" ]; then

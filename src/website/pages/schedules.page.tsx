@@ -21,7 +21,7 @@ import { useYesQuery } from "../hooks/useYesQuery";
 export function schedulesPage() {
   useDocumentTitle("Schedules | Brespi");
   const [editing, setEditing] = useState<"new" | Schedule>();
-  const [timezone, setTimezone] = useState<"utc" | "local">("local");
+  const [timezone, setTimezone] = useState<"utc" | "local">("utc");
 
   const scheduleClient = useRegistry(ScheduleClient);
   const pipelineClient = useRegistry(PipelineClient);
@@ -130,16 +130,6 @@ export function schedulesPage() {
               <div>
                 <span>Next? (</span>
                 <button
-                  onClick={() => setTimezone("local")}
-                  className={clsx("cursor-pointer decoration-c-accent decoration-2 underline-offset-3", {
-                    "text-white font-semibold underline": timezone === "local",
-                    "opacity-50": timezone !== "local",
-                  })}
-                >
-                  Local
-                </button>
-                <span> / </span>
-                <button
                   onClick={() => setTimezone("utc")}
                   className={clsx("cursor-pointer decoration-c-accent decoration-2 underline-offset-3", {
                     "text-white font-semibold underline": timezone === "utc",
@@ -147,6 +137,16 @@ export function schedulesPage() {
                   })}
                 >
                   UTC
+                </button>
+                <span> / </span>
+                <button
+                  onClick={() => setTimezone("local")}
+                  className={clsx("cursor-pointer decoration-c-accent decoration-2 underline-offset-3", {
+                    "text-white font-semibold underline": timezone === "local",
+                    "opacity-50": timezone !== "local",
+                  })}
+                >
+                  Local
                 </button>
                 <span>)</span>
               </div>
