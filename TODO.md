@@ -63,3 +63,4 @@
 ### Marketing
 * ✅ Move this repository to a different org
 * Create an accompanying landing page, with how it works, how to use, and how to configure (no exhaustive documentation)
+* Slightly rewrite the README to be more in line with the documentation page, and give a quick hint about what to find in the documentation, before linking there

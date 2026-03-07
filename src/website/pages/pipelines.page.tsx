@@ -120,10 +120,10 @@ export namespace Internal {
     let icon: PipelineVisualization["icon"];
     if (lastExecution) {
       if (lastExecution.result) {
-        subtitle = `${lastExecution.result.outcome === Outcome.success ? "Successfully executed" : "Failed to execute"} on ${Prettify.timestamp(lastExecution.result.completedAt)}`;
+        subtitle = `${lastExecution.result.outcome === Outcome.success ? "Successfully executed" : "Failed to execute"} on ${Prettify.timestamp(lastExecution.result.completedAt)} (UTC)`;
         icon = lastExecution.result.outcome;
       } else {
-        subtitle = `Started executing on ${Prettify.timestamp(lastExecution.startedAt)} ...`;
+        subtitle = `Started executing on ${Prettify.timestamp(lastExecution.startedAt)} (UTC) ...`;
         icon = "loading";
       }
     } else {

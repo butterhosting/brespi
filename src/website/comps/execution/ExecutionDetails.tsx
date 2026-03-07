@@ -15,13 +15,13 @@ export function ExecutionDetails({ execution }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="font-semibold">Started</p>
+        <p className="font-semibold">Started (UTC)</p>
         <code className="text-c-accent">{Prettify.timestamp(execution.startedAt)}</code>
       </div>
       {execution.result && (
         <>
           <div>
-            <p className="font-semibold">Completed</p>
+            <p className="font-semibold">Completed (UTC)</p>
             <code className="text-c-accent">{Prettify.timestamp(execution.result.completedAt)}</code>
           </div>
           <div>

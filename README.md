@@ -20,7 +20,7 @@ and many others.
 git clone https://github.com/butterhosting/brespi.git
 
 # Create a docker image with the desired runtime dependencies
-./brespi.sh image create --postgresql --mariadb
+./brespi image create --postgresql --mariadb
 
 # Run the container
 docker run --rm -p 3000:3000 brespi:latest

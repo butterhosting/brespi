@@ -216,9 +216,9 @@ export namespace StepDetails {
   export function actionDetails(action: Action): Block.Details | null {
     const result: Block.Details = {};
     if (action.startedAt) {
-      result["Started"] = Prettify.timestamp(action.startedAt);
+      result["Started (UTC)"] = Prettify.timestamp(action.startedAt);
       if (action.result) {
-        result["Completed"] = Prettify.timestamp(action.result.completedAt);
+        result["Completed (UTC)"] = Prettify.timestamp(action.result.completedAt);
         result["Duration"] = Prettify.duration(action.result.duration);
         switch (action.result.outcome) {
           case Outcome.success: {

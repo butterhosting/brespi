@@ -28,7 +28,7 @@ build_image() {
     shift
     printf "\n  BUILD %s\n" "$label"
     build_log=$(mktemp)
-    if ! ./brespi.sh image create "$@" >"$build_log" 2>&1; then
+    if ! ./brespi image create "$@" >"$build_log" 2>&1; then
         cat "$build_log"
         printf "  FAIL  %s (image build failed)\n" "$label"
         rm -f "$build_log"
