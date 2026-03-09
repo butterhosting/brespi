@@ -18,6 +18,7 @@ and many others.
 ```sh
 # Clone the source code
 git clone https://github.com/butterhosting/brespi.git
+cd brespi
 
 # Create a docker image with the desired runtime dependencies
 ./brespi image create --postgresql --mariadb
@@ -28,4 +29,4 @@ docker run --rm -p 3000:3000 brespi:latest
 
 ## Documentation
 
-Please visit https://brespi.butterhost.ing for detailed documentation.
+Please visit [www.butterhost.ing/brespi](https://www.butterhost.ing/brespi) for the full documentation, covering deployment, how to use the pipeline editor, scheduling, notifications, tips, tricks and more.
