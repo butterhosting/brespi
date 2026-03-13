@@ -1,4 +1,4 @@
-import mariadb from "mariadb";
+import * as mariadb from "mariadb";
 
 export namespace MariadbBoundary {
   export type Row = Record<string, string | number | boolean | null>;
