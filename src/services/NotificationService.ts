@@ -13,7 +13,7 @@ import { NotificationDispatchService } from "./NotificationDispatchService";
 
 export class NotificationService {
   private cache: NotificationPolicy[] = [];
-  private cacheUpdated?: Temporal.PlainDateTime;
+  private cacheUpdated?: Temporal.Instant;
   private readonly cacheMutex = new Mutex();
 
   public constructor(
@@ -81,14 +81,14 @@ export class NotificationService {
   }
 
   private async listPoliciesFromCache(): Promise<NotificationPolicy[]> {
-    const checkStale = () => !this.cacheUpdated || Temporal.Now.plainDateTimeISO().since(this.cacheUpdated).total("seconds") > 1;
+    const checkStale = () => !this.cacheUpdated || Temporal.Now.instant().since(this.cacheUpdated).total("seconds") > 1;
     if (checkStale()) {
       const { release } = await this.cacheMutex.acquire();
       try {
         if (checkStale()) {
           const policies = await this.repository.queryPolicies();
           this.cache = policies;
-          this.cacheUpdated = Temporal.Now.plainDateTimeISO();
+          this.cacheUpdated = Temporal.Now.instant();
         }
       } finally {
         release();

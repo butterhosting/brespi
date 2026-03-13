@@ -46,7 +46,7 @@
 * ✅ Refactor so the backend ALWAYS uses TZ=UTC for it's PlainDateTime objects ... but provide an environment option BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE with a default of UTC (if people wanna see their versions in a particular timestamp) --- but the internal default for PlainDateTime should be UTC always
 * ✅ Check if the `*Converter` classes can be made part of the Drizzle entity definition
 * ✅ Allow env var references on all text fields via the ${...} syntax (on the right side; give an overview of detected env vars in orange; this also requires updating descriptions)
-* Timezone revamp
+* ✅ Rework timezones
 * Implement a top-level `schema` number on the configuration object
 * Upgrade all dependencies
 

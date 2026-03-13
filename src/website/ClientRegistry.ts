@@ -32,6 +32,7 @@ export class ClientRegistry {
       O_BRESPI_STAGE: env.O_BRESPI_STAGE,
       O_BRESPI_VERSION: env.O_BRESPI_VERSION,
       O_BRESPI_COMMIT: env.O_BRESPI_COMMIT,
+      O_BRESPI_TIMEZONE: env.O_BRESPI_TIMEZONE,
     };
     if (Object.entries(envCopy).length > 0) {
       const longestKey = Object.keys(envCopy)

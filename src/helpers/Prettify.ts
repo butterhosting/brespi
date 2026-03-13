@@ -1,19 +1,23 @@
 import { Temporal } from "@js-temporal/polyfill";
 
-export namespace Prettify {
-  export function timestamp(value: Temporal.PlainDateTime): string {
-    const month = String(value.month).padStart(2, "0");
-    const day = String(value.day).padStart(2, "0");
-    const year = value.year;
+export class Prettify {
+  private static readonly monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    const hours = String(value.hour).padStart(2, "0");
-    const minutes = String(value.minute).padStart(2, "0");
-    const seconds = String(value.second).padStart(2, "0");
+  public static timestamp(instant: Temporal.Instant, timeZone: string): string {
+    const wallClockTime = instant.toZonedDateTimeISO(timeZone).toPlainDateTime();
 
-    return `${year}-${month}-${day} at ${hours}:${minutes}:${seconds}`;
+    const day = wallClockTime.day;
+    const month = this.monthNames[wallClockTime.month - 1];
+    const year = wallClockTime.year;
+
+    const hours = String(wallClockTime.hour).padStart(2, "0");
+    const minutes = String(wallClockTime.minute).padStart(2, "0");
+    const seconds = String(wallClockTime.second).padStart(2, "0");
+
+    return `${day} ${month} ${year} at ${hours}:${minutes}:${seconds}`;
   }
 
-  export function duration(value: Temporal.Duration): string {
+  public static duration(value: Temporal.Duration): string {
     const parts: string[] = [];
     const days = Math.floor(value.total("days"));
     const hours = Math.floor(value.total("hours")) % 24;

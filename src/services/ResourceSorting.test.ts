@@ -27,6 +27,7 @@ describe("resource sorting", async () => {
     context.stepServiceMock.cast(),
   );
   const scheduleService = new ScheduleService(
+    context.env,
     context.eventBus,
     context.scheduleRepository,
     context.pipelineRepositoryMock.cast(),

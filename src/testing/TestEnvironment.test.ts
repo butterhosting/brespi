@@ -97,9 +97,9 @@ export namespace TestEnvironment {
     const unitTestRoot = join(cwd, "opt", "unit-test");
     const env = Env.initialize("UTC", {
       O_BRESPI_STAGE: "development",
+      O_BRESPI_TIMEZONE: "UTC",
       X_BRESPI_ROOT: join(unitTestRoot, "brespi"),
-      X_BRESPI_LOGLEVEL: LogLevel.debug,
-      X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: "UTC",
+      X_BRESPI_LOGGING: LogLevel.warn,
       X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: "false",
     });
 

@@ -38,13 +38,13 @@ export namespace ActionConverter {
       stepId: db.stepId,
       stepType: db.stepType,
       previousStepId: db.previousStepId ?? undefined,
-      startedAt: db.startedAt ? Temporal.PlainDateTime.from(db.startedAt) : undefined,
+      startedAt: db.startedAt ? Temporal.Instant.from(db.startedAt) : undefined,
       result:
         db.resultOutcome && db.resultDurationMs !== null && db.resultCompletedAt
           ? {
               outcome: db.resultOutcome as Outcome,
               duration: Temporal.Duration.from({ milliseconds: db.resultDurationMs }),
-              completedAt: Temporal.PlainDateTime.from(db.resultCompletedAt),
+              completedAt: Temporal.Instant.from(db.resultCompletedAt),
               consumed: db.resultArtifactsConsumed ? JSON.parse(db.resultArtifactsConsumed) : [],
               produced: db.resultArtifactsProduced ? JSON.parse(db.resultArtifactsProduced) : [],
               errorMessage: db.resultErrorMessage ?? undefined,

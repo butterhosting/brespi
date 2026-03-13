@@ -8,12 +8,12 @@ export type Execution = {
   id: string;
   object: "execution";
   pipelineId: string;
-  startedAt: Temporal.PlainDateTime;
+  startedAt: Temporal.Instant;
   actions: Action[];
   result?: {
     outcome: Outcome;
     duration: Temporal.Duration;
-    completedAt: Temporal.PlainDateTime;
+    completedAt: Temporal.Instant;
   };
 };
 
@@ -24,13 +24,13 @@ export namespace Execution {
         id: z.string(),
         object: z.literal("execution"),
         pipelineId: z.string(),
-        startedAt: z.string().transform((x) => Temporal.PlainDateTime.from(x)),
+        startedAt: z.string().transform((x) => Temporal.Instant.from(x)),
         actions: z.array(Action.parse.SCHEMA),
         result: z
           .object({
             duration: z.string().transform(Temporal.Duration.from),
             outcome: z.enum(Outcome),
-            completedAt: z.string().transform((x) => Temporal.PlainDateTime.from(x)),
+            completedAt: z.string().transform((x) => Temporal.Instant.from(x)),
           })
           .optional(),
       }),

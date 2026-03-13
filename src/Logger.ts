@@ -4,7 +4,8 @@ import { Env } from "./Env";
 import { LogLevel } from "./models/LogLevel";
 
 export class Logger {
-  private static globalSetting: LogLevel;
+  private static timeZone: string;
+  private static globalLogLevel: LogLevel;
   private static readonly emojis: Record<LogLevel, string> = {
     [LogLevel.debug]: "🐞",
     [LogLevel.info]: "ℹ️",
@@ -13,13 +14,14 @@ export class Logger {
   };
 
   public static initialize(env: Env.Private) {
-    this.globalSetting = env.X_BRESPI_LOGLEVEL;
+    this.timeZone = env.O_BRESPI_TIMEZONE;
+    this.globalLogLevel = env.X_BRESPI_LOGGING;
   }
 
   private readonly filename: string;
 
   public constructor(file: string) {
-    if (!Logger.globalSetting) {
+    if (!Logger.globalLogLevel) {
       throw new Error("Logger must be initialized first");
     }
     this.filename = basename(file);
@@ -43,14 +45,14 @@ export class Logger {
 
   private log = (level: LogLevel, ...args: unknown[]) => {
     if (this.shouldLog(level)) {
-      const timestamp = Temporal.Now.plainDateTimeISO().toString({ smallestUnit: "second" }).replace("T", " ");
+      const timestamp = Temporal.Now.plainDateTimeISO(Logger.timeZone).toString({ smallestUnit: "second" }).replace("T", " ");
       const prefix = `${timestamp} [${level.toUpperCase()}] ${Logger.emojis[level]} ${this.filename} |`;
       console[level].call(console, prefix, ...args);
     }
   };
 
   private shouldLog = (level: LogLevel): boolean => {
-    switch (Logger.globalSetting) {
+    switch (Logger.globalLogLevel) {
       case LogLevel.debug:
         return true;
       case LogLevel.info:

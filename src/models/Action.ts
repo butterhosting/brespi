@@ -11,11 +11,11 @@ export type Action = {
   stepId: string;
   stepType: string;
   previousStepId?: string;
-  startedAt?: Temporal.PlainDateTime;
+  startedAt?: Temporal.Instant;
   result?: {
     outcome: Outcome;
     duration: Temporal.Duration;
-    completedAt: Temporal.PlainDateTime;
+    completedAt: Temporal.Instant;
     consumed: Action.ArtifactSummary[];
     produced: Action.ArtifactSummary[];
     errorMessage?: string;
@@ -40,13 +40,13 @@ export namespace Action {
         previousStepId: z.string().optional(),
         startedAt: z
           .string()
-          .transform((x) => Temporal.PlainDateTime.from(x))
+          .transform((x) => Temporal.Instant.from(x))
           .optional(),
         result: z
           .object({
             outcome: z.enum(Outcome),
             duration: z.string().transform(Temporal.Duration.from),
-            completedAt: z.string().transform((x) => Temporal.PlainDateTime.from(x)),
+            completedAt: z.string().transform((x) => Temporal.Instant.from(x)),
             consumed: z.array(artifactSummarySchema),
             produced: z.array(artifactSummarySchema),
             errorMessage: z.string().optional(),

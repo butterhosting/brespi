@@ -1,9 +1,8 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export namespace Version {
-  export function now(timezone: string): string {
-    const zdt = Temporal.Now.zonedDateTimeISO(timezone);
-    return `${zdt.toPlainDateTime().toString({ fractionalSecondDigits: 3 })}${zdt.offset}`;
+  export function now(): string {
+    return Temporal.Now.instant().toString({ fractionalSecondDigits: 3 });
   }
 
   export function compare(a: string, b: string): number {

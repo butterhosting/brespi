@@ -6,23 +6,29 @@ import { Icon } from "../Icon";
 import { StepDescription } from "@/website/details/StepDescription";
 import { Action } from "@/models/Action";
 import { OmitBetter } from "@/types/OmitBetter";
+import { useRegistry } from "@/website/hooks/useRegistry";
 
 type Props = {
   execution: Execution;
 };
 export function ExecutionDetails({ execution }: Props) {
+  const { O_BRESPI_TIMEZONE: timeZone } = useRegistry("env");
   const failedActions = Internal.convertToFailedActions(execution.actions);
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="font-semibold">Started (UTC)</p>
-        <code className="text-c-accent">{Prettify.timestamp(execution.startedAt)}</code>
+        <p className="font-semibold">Started</p>
+        <code className="text-c-accent">
+          {Prettify.timestamp(execution.startedAt, timeZone)} ({timeZone})
+        </code>
       </div>
       {execution.result && (
         <>
           <div>
-            <p className="font-semibold">Completed (UTC)</p>
-            <code className="text-c-accent">{Prettify.timestamp(execution.result.completedAt)}</code>
+            <p className="font-semibold">Completed</p>
+            <code className="text-c-accent">
+              {Prettify.timestamp(execution.result.completedAt, timeZone)} ({timeZone})
+            </code>
           </div>
           <div>
             <p className="font-semibold">Duration</p>

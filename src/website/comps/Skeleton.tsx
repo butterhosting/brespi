@@ -70,7 +70,10 @@ export namespace Skeleton {
     const seed = () => restrictedClient.seed().then(() => location.reload());
     return (
       <footer className="u-root-grid-minus-gutters my-12 flex flex-col items-center gap-4">
-        <div className="text-4xl font-extrabold italic text-c-dark pr-5">Brespi</div>
+        <div className="flex items-center gap-2">
+          <div className="size-6 aspect-square bg-c-accent rounded" />
+          <div className="text-4xl font-extrabold italic text-c-dark pr-5">Brespi</div>
+        </div>
         <div className="italic text-c-dark -mt-3 pl-5">
           by{" "}
           <a href="https://www.butterhost.ing" target="_blank" rel="nooopener noreferrer" className="text-c-accent hover:text-c-dark">

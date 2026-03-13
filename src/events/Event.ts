@@ -43,7 +43,7 @@ export namespace Event {
   type Instance<T extends Event.Type, D> = {
     id: string;
     object: "event";
-    published: Temporal.PlainDateTime;
+    published: Temporal.Instant;
     type: T;
     data: D;
   };

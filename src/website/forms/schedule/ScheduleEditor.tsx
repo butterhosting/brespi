@@ -16,7 +16,7 @@ type Form = {
   [ScheduleEditor.Field.active]: boolean;
   [ScheduleEditor.Field.cron]: string;
 };
-export function ScheduleEditor({ className, gridClassName, existing, timezone, pipelines, onSave, onDelete, onCancel }: Props) {
+export function ScheduleEditor({ className, gridClassName, existing, pipelines, onSave, onDelete, onCancel }: Props) {
   const scheduleClient = useRegistry(ScheduleClient);
   const dialogClient = useRegistry(DialogClient);
   const { register, handleSubmit, formState, watch, setError, clearErrors } = useForm<Form>({
@@ -103,7 +103,7 @@ export function ScheduleEditor({ className, gridClassName, existing, timezone, p
           placeholder="E.g.: 0 12 * * FRI"
           {...register(ScheduleEditor.Field.cron)}
         />
-        <CronEvaluations expression={cron} timezone={timezone} className={clsx(!active && "text-c-dim line-through decoration-c-error")} />
+        <CronEvaluations expression={cron} className={clsx(!active && "text-c-dim line-through decoration-c-error")} />
         <div className="flex flex-col items-end gap-1">
           <Button className="border-none font-normal text-c-success hover:text-white" onClick={handleSubmit(save)}>
             Save
@@ -127,7 +127,6 @@ export namespace ScheduleEditor {
   export type Props = {
     className?: string;
     gridClassName: string;
-    timezone: "utc" | "local";
     existing?: Schedule;
     pipelines: Pipeline[];
     onSave: (schedule: Schedule) => unknown;

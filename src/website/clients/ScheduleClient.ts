@@ -37,12 +37,12 @@ export class ScheduleClient {
   }: {
     expression: string;
     amount: number;
-  }): Promise<Temporal.PlainDateTime[] | undefined> {
+  }): Promise<Temporal.Instant[] | undefined> {
     try {
       const { body } = await this.yesttp.post<string[]>("/schedules/evaluate-cron-expression", {
         body: { expression, amount },
       });
-      return body.map((x) => Temporal.PlainDateTime.from(x));
+      return body.map((x) => Temporal.Instant.from(x));
     } catch (e) {
       if (ScheduleError.invalid_cron_expression.matches(e)) {
         return undefined;

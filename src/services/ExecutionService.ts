@@ -85,7 +85,7 @@ export class ExecutionService {
       id,
       object: "execution",
       pipelineId,
-      startedAt: Temporal.Now.plainDateTimeISO(),
+      startedAt: Temporal.Now.instant(),
       actions: pipeline.steps.map((step) => ({
         id: Bun.randomUUIDv7(),
         object: "action",
@@ -150,7 +150,7 @@ export class ExecutionService {
 
     // Set final result
     const hasError = execution.actions.some((a) => a.result?.outcome === Outcome.error);
-    const completedAt = Temporal.Now.plainDateTimeISO();
+    const completedAt = Temporal.Now.instant();
     execution.result = {
       outcome: hasError ? Outcome.error : Outcome.success,
       duration: execution.startedAt.until(completedAt).round("milliseconds"),
@@ -176,7 +176,7 @@ export class ExecutionService {
     childrenMap: Map<string | undefined, Step[]>;
     mutex: Mutex;
   }): Promise<void> {
-    const startedAt = Temporal.Now.plainDateTimeISO();
+    const startedAt = Temporal.Now.instant();
     await this.updateActionAndNotifySockets({
       executionId,
       actionStepId: step.id,
@@ -202,7 +202,7 @@ export class ExecutionService {
       await Bun.sleep(this.env.X_BRESPI_ARTIFICIAL_STEP_EXECUTION_DELAY.total("milliseconds"));
       await this.cleanupArtifacts({ input, output });
     }
-    const completedAt = Temporal.Now.plainDateTimeISO();
+    const completedAt = Temporal.Now.instant();
     const duration = startedAt.until(completedAt);
 
     const stepCategory = Step.getCategory(step);

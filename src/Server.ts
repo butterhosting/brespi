@@ -210,7 +210,7 @@ export class Server {
         },
         "/api/schedules/evaluate-cron-expression": {
           POST: this.handleRoute(async (request) => {
-            const evaluations: Temporal.PlainDateTime[] = this.scheduleService.evaluateCronExpression(await request.json());
+            const evaluations: Temporal.Instant[] = this.scheduleService.evaluateCronExpression(await request.json());
             return Response.json(evaluations);
           }),
         },
@@ -271,13 +271,15 @@ export class Server {
     console.log(
       [
         "",
-        `  🚀 \x1b[1mBrespi started on ${Prettify.timestamp(Temporal.Now.plainDateTimeISO())} (${Temporal.Now.timeZoneId()})\x1b[0m`,
+        `  🚀 \x1b[1mBrespi started on ${Prettify.timestamp(Temporal.Now.instant(), this.env.O_BRESPI_TIMEZONE)}\x1b[0m`,
         "",
         `  \x1b[1mStage\x1b[0m     ${this.env.O_BRESPI_STAGE}`,
         `  \x1b[1mVersion\x1b[0m   ${this.env.O_BRESPI_VERSION}`,
         `  \x1b[1mCommit\x1b[0m    ${this.env.O_BRESPI_COMMIT}`,
-        `  \x1b[1mLoglevel\x1b[0m  ${this.env.X_BRESPI_LOGLEVEL}`,
+        "",
         `  \x1b[1mServer\x1b[0m    ${server.url}`,
+        `  \x1b[1mLogging\x1b[0m   ${this.env.X_BRESPI_LOGGING}`,
+        `  \x1b[1mTimezone\x1b[0m  ${this.env.O_BRESPI_TIMEZONE}`,
         "",
       ].join("\n"),
     );

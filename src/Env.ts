@@ -1,16 +1,16 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { isAbsolute, join } from "path";
 import { z } from "zod/v4";
-import { TimeZone } from "./helpers/TimeZone";
 import packageJson from "../package.json";
+import { TimeZone } from "./helpers/TimeZone";
 import { LogLevel } from "./models/LogLevel";
 
 export namespace Env {
   const baseEnv = z.object({
     O_BRESPI_STAGE: z.enum(["development", "e2etest", "production"]),
     X_BRESPI_ROOT: z.string(),
-    X_BRESPI_LOGLEVEL: z.enum(LogLevel),
-    X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE: z.string().refine((tz) => TimeZone.check(tz), {
+    X_BRESPI_LOGGING: z.enum(LogLevel),
+    O_BRESPI_TIMEZONE: z.string().refine((tz) => TimeZone.check(tz), {
       error: "invalid_timezone",
     }),
     X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: z.enum(["true", "false"]),

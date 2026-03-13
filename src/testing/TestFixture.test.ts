@@ -35,7 +35,7 @@ export namespace TestFixture {
       const defaults: Event.ExecutionStarted = {
         id: Bun.randomUUIDv7(),
         object: "event",
-        published: Temporal.Now.plainDateTimeISO(),
+        published: Temporal.Now.instant(),
         type: Event.Type.execution_started,
         data: {
           trigger: "schedule",
@@ -48,7 +48,7 @@ export namespace TestFixture {
       const defaults: Event.ExecutionCompleted = {
         id: Bun.randomUUIDv7(),
         object: "event",
-        published: Temporal.Now.plainDateTimeISO(),
+        published: Temporal.Now.instant(),
         type: Event.Type.execution_completed,
         data: {
           trigger: "schedule",
@@ -65,12 +65,12 @@ export namespace TestFixture {
       id: Bun.randomUUIDv7(),
       object: "execution",
       pipelineId: "pipeline-123",
-      startedAt: Temporal.Now.plainDateTimeISO(),
+      startedAt: Temporal.Now.instant(),
       actions: [],
       result: {
         outcome: Outcome.success,
         duration: Temporal.Duration.from({ seconds: 42 }),
-        completedAt: Temporal.Now.plainDateTimeISO(),
+        completedAt: Temporal.Now.instant(),
       },
     };
     return deepMerge(defaults, overrides);

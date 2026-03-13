@@ -33,10 +33,10 @@ describe("regression", () => {
   });
 
   describe("database querying", async () => {
-    for (const { tableName, table } of RegressionSuite.Database.getTableOverview()) {
-      it(tableName, async () => {
+    for (const { table, queryFn } of RegressionSuite.Database.getQueryFns()) {
+      it(table, async () => {
         // when
-        const records = await database.select().from(table);
+        const records = await queryFn(database);
         // then
         expect(records.length).toBeGreaterThan(0);
       });

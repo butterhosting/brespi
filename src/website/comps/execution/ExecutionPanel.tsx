@@ -11,6 +11,7 @@ import { PaginationButtons } from "../PaginationButtons";
 import { Spinner } from "../Spinner";
 import { ExecutionIcon } from "../ExecutionIcon";
 import { ExecutionDetails } from "./ExecutionDetails";
+import { useRegistry } from "@/website/hooks/useRegistry";
 
 type Props = {
   query: useYesQuery.Result<Execution[], ProblemDetails>;
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function ExecutionPanel({ query, selectedExecutionId, onSelect, onDeselect }: Props) {
+  const { O_BRESPI_TIMEZONE: timeZone } = useRegistry("env");
   const { currentPage, setCurrentPage, totalPages, visibleItems } = usePagination({
     items: query.data,
     deselect: onDeselect,
@@ -78,8 +80,8 @@ export function ExecutionPanel({ query, selectedExecutionId, onSelect, onDeselec
               </h3>
               <p className="font-light italic text-c-dim">
                 {execution.result
-                  ? `Completed on ${Prettify.timestamp(execution.result.completedAt)} (UTC)`
-                  : `Started on ${Prettify.timestamp(execution.startedAt)} (UTC)`}
+                  ? `Completed on ${Prettify.timestamp(execution.result.completedAt, timeZone)} (${timeZone})`
+                  : `Started on ${Prettify.timestamp(execution.startedAt, timeZone)} (${timeZone})`}
               </p>
             </div>
           </button>

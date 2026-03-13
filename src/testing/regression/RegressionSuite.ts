@@ -152,17 +152,18 @@ export namespace RegressionSuite {
     type TableRecords = {
       [K in keyof Tables]: Array<InferInsertModel<Tables[K]>>;
     };
-    export function getTableOverview() {
-      const tables: Tables = {
-        $execution: $execution,
-        $action: $action,
-        $scheduleMetadata: $scheduleMetadata,
-        $notificationPolicyMetadata: $notificationPolicyMetadata,
+
+    export function getQueryFns(): Array<{ table: string; queryFn: (sqlite: Sqlite) => Promise<unknown[]> }> {
+      const overview: Record<keyof Tables, (sqlite: Sqlite) => Promise<unknown[]>> = {
+        $action: (sqlite) => sqlite.query.$action.findMany().then((records) => records.map(ActionConverter.convert)),
+        $execution: (sqlite) =>
+          sqlite.query.$execution.findMany({ with: { actions: true } }).then((records) => records.map(ExecutionConverter.convert)),
+        $scheduleMetadata: (sqlite) =>
+          sqlite.query.$scheduleMetadata.findMany().then((records) => records.map(ScheduleMetadataConverter.convert)),
+        $notificationPolicyMetadata: (sqlite) =>
+          sqlite.query.$notificationPolicyMetadata.findMany().then((records) => records.map(NotificationPolicyMetadataConverter.convert)),
       };
-      return Object.values(tables).map((table) => ({
-        table,
-        tableName: getTableName(table),
-      }));
+      return Object.entries(overview).map(([table, queryFn]) => ({ table, queryFn }));
     }
 
     const databasePath = join(Path.suite, "db.sqlite");

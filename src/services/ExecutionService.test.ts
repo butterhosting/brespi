@@ -140,7 +140,7 @@ describe(ExecutionService.name, async () => {
       id: "X",
       object: "execution",
       pipelineId: "123",
-      startedAt: Temporal.Now.plainDateTimeISO(),
+      startedAt: Temporal.Now.instant(),
       actions: [],
     });
     // when

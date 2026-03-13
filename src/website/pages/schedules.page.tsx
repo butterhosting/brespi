@@ -21,7 +21,7 @@ import { useYesQuery } from "../hooks/useYesQuery";
 export function schedulesPage() {
   useDocumentTitle("Schedules | Brespi");
   const [editing, setEditing] = useState<"new" | Schedule>();
-  const [timezone, setTimezone] = useState<"utc" | "local">("utc");
+  const { O_BRESPI_TIMEZONE: timeZone } = useRegistry("env");
 
   const scheduleClient = useRegistry(ScheduleClient);
   const pipelineClient = useRegistry(PipelineClient);
@@ -34,7 +34,7 @@ export function schedulesPage() {
   });
 
   const gridClassName = clsx(
-    "grid grid-cols-[88px_minmax(220px,3fr)_minmax(180px,2fr)_minmax(100px,2fr)_80px]",
+    "grid grid-cols-[88px_minmax(220px,2.8fr)_minmax(180px,1.7fr)_minmax(100px,2fr)_80px]",
     "items-center p-6",
     "border-t border-c-dim/20",
   );
@@ -127,37 +127,15 @@ export function schedulesPage() {
               <label htmlFor={ScheduleEditor.Field.active}>Active</label>
               <label htmlFor={ScheduleEditor.Field.pipelineId}>Pipeline</label>
               <label htmlFor={ScheduleEditor.Field.cron}>Cron</label>
-              <div>
-                <span>Next? (</span>
-                <button
-                  onClick={() => setTimezone("utc")}
-                  className={clsx("cursor-pointer decoration-c-accent decoration-2 underline-offset-3", {
-                    "text-white font-semibold underline": timezone === "utc",
-                    "opacity-50": timezone !== "utc",
-                  })}
-                >
-                  UTC
-                </button>
-                <span> / </span>
-                <button
-                  onClick={() => setTimezone("local")}
-                  className={clsx("cursor-pointer decoration-c-accent decoration-2 underline-offset-3", {
-                    "text-white font-semibold underline": timezone === "local",
-                    "opacity-50": timezone !== "local",
-                  })}
-                >
-                  Local
-                </button>
-                <span>)</span>
+              <div className="col-span-2 truncate">
+                Next? <span className="text-c-dim">({timeZone})</span>
               </div>
-              <div />
             </div>
             {editing === "new" ? (
               <ScheduleEditor
                 className={clsx(query.data.schedules.length === 0 && "rounded-b-2xl")}
                 gridClassName={gridClassName}
                 pipelines={query.data.pipelines}
-                timezone={timezone}
                 {...editorCallbacks}
               />
             ) : (
@@ -184,7 +162,6 @@ export function schedulesPage() {
                     key={schedule.id}
                     gridClassName={gridClassName}
                     className={clsx(index + 1 === length && "rounded-b-2xl")}
-                    timezone={timezone}
                     existing={schedule}
                     pipelines={query.data!.pipelines}
                     {...editorCallbacks}
@@ -199,11 +176,7 @@ export function schedulesPage() {
                     <div className="truncate text-c-dim">{pipelineId}</div>
                   </div>
                   <div className="truncate font-mono">{cron}</div>
-                  <CronEvaluations
-                    expression={cron}
-                    timezone={timezone}
-                    className={clsx(!active && "text-c-dim line-through decoration-c-error")}
-                  />
+                  <CronEvaluations expression={cron} className={clsx(!active && "text-c-dim line-through decoration-c-error truncate")} />
                   <div className="flex justify-end">
                     <Button
                       onClick={() => setEditing(schedule)}

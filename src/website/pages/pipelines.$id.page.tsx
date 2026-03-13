@@ -52,6 +52,7 @@ export function pipelines$idPage() {
   const executionClient = useRegistry(ExecutionClient);
   const socketClient = useRegistry(SocketClient);
   const dialogClient = useRegistry(DialogClient);
+  const { O_BRESPI_TIMEZONE: timeZone } = useRegistry("env");
 
   /**
    * Data
@@ -109,7 +110,7 @@ export function pipelines$idPage() {
     if (initial === "new") {
       mainForm.reset({
         interactivity: Interactivity.editing,
-        name: `My New Pipeline (${Prettify.timestamp(Temporal.Now.plainDateTimeISO())})`,
+        name: `My New Pipeline (${Prettify.timestamp(Temporal.Now.instant(), timeZone)})`,
         steps: [],
       });
     } else {
@@ -131,7 +132,7 @@ export function pipelines$idPage() {
     } else if (source.object === "pipeline") {
       blocks = source.steps.map(Internal.convertStepToBlock);
     } else {
-      blocks = source.actions.map(Internal.convertActionToBlock);
+      blocks = source.actions.map((action) => Internal.convertActionToBlock(action, timeZone));
     }
     canvasApi.current!.reset(blocks);
   };
@@ -202,7 +203,7 @@ export function pipelines$idPage() {
         if (oldExecution && selectedExecutionIdRef.current === newExecution.id) {
           const { differingActions } = Internal.extractDifferingActions({ oldExecution, newExecution });
           differingActions.forEach((action) => {
-            canvasApi.current!.update(action.stepId, Internal.convertActionToBlock(action));
+            canvasApi.current!.update(action.stepId, Internal.convertActionToBlock(action, timeZone));
           });
         }
       },
@@ -599,7 +600,7 @@ namespace Internal {
       selected: false,
     };
   }
-  export function convertActionToBlock(action: Action): Block {
+  export function convertActionToBlock(action: Action, timeZone: string): Block {
     return {
       id: action.stepId,
       incomingId: action.previousStepId,
@@ -612,7 +613,7 @@ namespace Internal {
             ? "success"
             : "error",
       label: Step.isTypeInstance(action.stepType) ? StepDescription.forType(action.stepType) : action.stepType,
-      details: ActionDetails.get(action),
+      details: ActionDetails.get(action, timeZone),
       handles: Step.isTypeInstance(action.stepType) ? convertTypeToHandles(action.stepType) : [Block.Handle.input, Block.Handle.output],
       selected: false,
     };

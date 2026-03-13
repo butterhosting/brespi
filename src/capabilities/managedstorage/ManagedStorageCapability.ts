@@ -183,9 +183,9 @@ export class ManagedStorageCapability {
   }
 
   private async waitForAvailableTimestamp(manifest: Manifest): Promise<string> {
-    const taken = manifest.items.map(({ version: isoTimestamp }) => isoTimestamp);
+    const taken = manifest.items.map(({ version: timestamp }) => timestamp);
     while (true) {
-      const timestamp = Version.now(this.env.X_BRESPI_MANAGED_STORAGE_VERSIONING_TIMEZONE);
+      const timestamp = Version.now();
       if (!taken.includes(timestamp)) {
         return timestamp;
       }

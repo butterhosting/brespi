@@ -4,6 +4,7 @@ import { NotificationService } from "./NotificationService";
 import { PipelineService } from "./PipelineService";
 import { ScheduleService } from "./ScheduleService";
 import { ConfigurationService } from "./ConfigurationService";
+import { chmod } from "fs/promises";
 
 export class RestrictedService {
   public constructor(
@@ -27,6 +28,7 @@ export class RestrictedService {
     await this.purge();
     const { backup: postgresql } = await this.createPostgresqlBackupAndRestore();
     const { backup: mariadb } = await this.createMariadbBackupAndRestore();
+    await this.createSleepySlowpokePipeline();
     await this.createEverythingPipeline();
     await this.createSchedule(postgresql);
     await this.createSchedule(mariadb);
@@ -310,6 +312,44 @@ export class RestrictedService {
       ],
     });
     return { backup, restore };
+  }
+
+  private async createSleepySlowpokePipeline() {
+    const path = "opt/sleep.sh";
+    await Bun.write(path, "#!/bin/bash\nsleep 10");
+    await chmod(path, 0o755);
+    await this.pipelineService.create({
+      name: "Sleepy Slowpoke",
+      steps: [
+        {
+          id: "agncwzsybgwg",
+          object: "step",
+          type: Step.Type.filter,
+          filterCriteria: {
+            method: "exact",
+            name: "",
+          },
+        },
+        {
+          id: "tcnkxykqiwef",
+          previousId: "agncwzsybgwg",
+          object: "step",
+          type: Step.Type.custom_script,
+          path,
+          passthrough: true,
+        },
+        {
+          id: "qvejsipwxooe",
+          previousId: "tcnkxykqiwef",
+          object: "step",
+          type: Step.Type.filter,
+          filterCriteria: {
+            method: "exact",
+            name: "",
+          },
+        },
+      ],
+    });
   }
 
   private async createEverythingPipeline() {

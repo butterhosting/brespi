@@ -34,14 +34,14 @@ export namespace ExecutionConverter {
       id: db.id,
       object: "execution",
       pipelineId: db.pipelineId,
-      startedAt: Temporal.PlainDateTime.from(db.startedAt),
+      startedAt: Temporal.Instant.from(db.startedAt),
       actions: db.actions.map((action) => ActionConverter.convert(action)),
       result:
         db.resultOutcome && db.resultDurationMs !== null && db.resultCompletedAt
           ? {
               outcome: db.resultOutcome as Outcome,
               duration: Temporal.Duration.from({ milliseconds: db.resultDurationMs }),
-              completedAt: Temporal.PlainDateTime.from(db.resultCompletedAt),
+              completedAt: Temporal.Instant.from(db.resultCompletedAt),
             }
           : undefined,
     };

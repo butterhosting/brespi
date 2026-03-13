@@ -23,6 +23,7 @@ export function pipelinesPage() {
   useDocumentTitle("Pipelines | Brespi");
   const pipelineClient = useRegistry(PipelineClient);
   const socketClient = useRegistry(SocketClient);
+  const { O_BRESPI_TIMEZONE: timeZone } = useRegistry("env");
 
   const query = useYesQuery<Internal.PipelineVisualization[], ProblemDetails>({
     queryFn: () =>
@@ -34,7 +35,7 @@ export function pipelinesPage() {
           icon: "new",
           currentlyExecutingId: null,
         },
-        ...pipelines.map(Internal.convertToVisualization),
+        ...pipelines.map((pipeline) => Internal.convertToVisualization(pipeline, timeZone)),
       ]),
   });
 
@@ -115,15 +116,15 @@ export namespace Internal {
     subtitle?: string;
     icon: ExecutionIcon.Props["variant"];
   };
-  export function convertToVisualization({ id, name, lastExecution }: PipelineView): PipelineVisualization {
+  export function convertToVisualization({ id, name, lastExecution }: PipelineView, timeZone: string): PipelineVisualization {
     let subtitle = "";
     let icon: PipelineVisualization["icon"];
     if (lastExecution) {
       if (lastExecution.result) {
-        subtitle = `${lastExecution.result.outcome === Outcome.success ? "Successfully executed" : "Failed to execute"} on ${Prettify.timestamp(lastExecution.result.completedAt)} (UTC)`;
+        subtitle = `${lastExecution.result.outcome === Outcome.success ? "Successfully executed" : "Failed to execute"} on ${Prettify.timestamp(lastExecution.result.completedAt, timeZone)} (${timeZone})`;
         icon = lastExecution.result.outcome;
       } else {
-        subtitle = `Started executing on ${Prettify.timestamp(lastExecution.startedAt)} (UTC) ...`;
+        subtitle = `Started executing on ${Prettify.timestamp(lastExecution.startedAt, timeZone)} (${timeZone}) ...`;
         icon = "loading";
       }
     } else {

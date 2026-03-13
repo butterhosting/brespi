@@ -18,7 +18,7 @@ describe(ManagedStorageCapability.name, async () => {
 
   const Regex = {
     RANDOM_ID: /\w+/.source,
-    TIMESTAMP: /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+[+-]\d{2}:\d{2}/.source,
+    TIMESTAMP: /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z/.source,
   };
 
   describe("insert", () => {
@@ -102,7 +102,7 @@ describe(ManagedStorageCapability.name, async () => {
         const existingManifest: Manifest = {
           object: "manifest",
           items: range.map((index) => ({
-            version: Version.now("UTC"),
+            version: Version.now(),
             totalSize: range.length,
             listingPath: `blabla-${index}`,
           })),
@@ -185,23 +185,22 @@ describe(ManagedStorageCapability.name, async () => {
   });
 
   describe("select", () => {
-    const stripBrackets = (zdt: Temporal.ZonedDateTime) => zdt.toString().replace(/\[.*\]$/, "");
     const Timestamp = {
-      _now_: Temporal.Now.zonedDateTimeISO("UTC"),
+      _now_: Temporal.Now.instant(),
       get VERY_LONG_AGO() {
-        return stripBrackets(this._now_.subtract({ days: 365000 }));
+        return this._now_.subtract({ hours: 365000 * 24 }).toString();
       },
       get LAST_YEAR() {
-        return stripBrackets(this._now_.subtract({ days: 365 }));
+        return this._now_.subtract({ hours: 365 * 24 }).toString();
       },
       get PRESENT() {
-        return stripBrackets(this._now_);
+        return this._now_.toString();
       },
       get NEXT_YEAR() {
-        return stripBrackets(this._now_.add({ days: 365 }));
+        return this._now_.add({ hours: 365 * 24 }).toString();
       },
       get VERY_FAR_AWAY() {
-        return stripBrackets(this._now_.add({ days: 365000 }));
+        return this._now_.add({ hours: 365000 * 24 }).toString();
       },
     };
 

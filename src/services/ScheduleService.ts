@@ -1,8 +1,11 @@
+import { Env } from "@/Env";
 import { ScheduleError } from "@/errors/ScheduleError";
 import { ServerError } from "@/errors/ServerError";
 import { Event } from "@/events/Event";
 import { EventBus } from "@/events/EventBus";
+import { CronJob } from "@/helpers/CronJob";
 import { ZodProblem } from "@/helpers/ZodIssues";
+import { Logger } from "@/Logger";
 import { Configuration } from "@/models/Configuration";
 import { Schedule } from "@/models/Schedule";
 import { PipelineRepository } from "@/repositories/PipelineRepository";
@@ -11,13 +14,13 @@ import { Temporal } from "@js-temporal/polyfill";
 import { Cron } from "croner";
 import z from "zod/v4";
 import { ExecutionService } from "./ExecutionService";
-import { Logger } from "@/Logger";
 
 export class ScheduleService {
   private readonly log = new Logger(__filename);
-  private readonly activeCronJobs = new Map<string, Cron>();
+  private readonly activeCronJobs = new Map<string, CronJob>();
 
   public constructor(
+    private readonly env: Env.Private,
     private readonly eventBus: EventBus,
     private readonly scheduleRepository: ScheduleRepository,
     private readonly pipelineRepository: PipelineRepository,
@@ -74,21 +77,16 @@ export class ScheduleService {
     return schedule;
   }
 
-  public evaluateCronExpression(unknown: z.output<typeof ScheduleService.EvaluateCronExpression>): Temporal.PlainDateTime[] {
+  public evaluateCronExpression(unknown: z.output<typeof ScheduleService.EvaluateCronExpression>): Temporal.Instant[] {
     const { expression, amount } = ScheduleService.EvaluateCronExpression.parse(unknown);
-    let cron: Cron | undefined = undefined;
     try {
-      cron = new Cron(expression);
-      const roundedNow = new Date(Math.floor(Date.now() / 1000) * 1000); // Round down to current second for stable results within the same second
-      return cron.nextRuns(amount, roundedNow).map((date) =>
-        Temporal.Instant.fromEpochMilliseconds(date.getTime())
-          .toZonedDateTimeISO(Temporal.Now.timeZoneId()) //
-          .toPlainDateTime(),
-      );
+      return CronJob.evaluateExpression({
+        expression,
+        timeZone: this.env.O_BRESPI_TIMEZONE,
+        amount,
+      });
     } catch (e) {
       throw ScheduleError.invalid_cron_expression();
-    } finally {
-      cron?.stop();
     }
   }
 
@@ -136,10 +134,10 @@ export class ScheduleService {
 
   private start(schedule: Schedule) {
     if (schedule.active) {
-      const cron = new Cron(schedule.cron, async () => {
+      const cronJob = new CronJob(schedule.cron, this.env.O_BRESPI_TIMEZONE, async () => {
         await this.executionService.create({ pipelineId: schedule.pipelineId, trigger: "schedule" }).catch(this.log.error);
       });
-      this.activeCronJobs.set(schedule.id, cron);
+      this.activeCronJobs.set(schedule.id, cronJob);
     }
   }
 

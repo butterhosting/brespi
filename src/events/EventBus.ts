@@ -15,7 +15,7 @@ export class EventBus {
     const event = {
       id: Bun.randomUUIDv7(),
       object: "event",
-      published: Temporal.Now.plainDateTimeISO(),
+      published: Temporal.Now.instant(),
       type,
       data,
     } as Event;

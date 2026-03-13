@@ -4,8 +4,6 @@ import { Manifest } from "./Manifest";
 import { Version } from "./Version";
 
 describe("Manifest", () => {
-  const stripBrackets = (zdt: Temporal.ZonedDateTime) => zdt.toString().replace(/\[.*\]$/, "");
-
   describe("Item", () => {
     it("sorts from new to old", () => {
       // given
@@ -13,17 +11,21 @@ describe("Manifest", () => {
         {
           listingPath: "now",
           totalSize: 1,
-          version: Version.now("UTC"),
+          version: Version.now(),
         },
         {
           listingPath: "past",
           totalSize: 1,
-          version: stripBrackets(Temporal.Now.zonedDateTimeISO("UTC").subtract({ days: 100 })),
+          version: Temporal.Now.instant()
+            .subtract({ hours: 100 * 24 })
+            .toString(),
         },
         {
           listingPath: "future",
           totalSize: 1,
-          version: stripBrackets(Temporal.Now.zonedDateTimeISO("UTC").add({ days: 100 })),
+          version: Temporal.Now.instant()
+            .add({ hours: 100 * 24 })
+            .toString(),
         },
       ];
       // when
