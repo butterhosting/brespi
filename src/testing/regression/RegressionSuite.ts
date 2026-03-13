@@ -64,6 +64,7 @@ test.skip("regression suite management", async () => {
 const Example = {
   async configuration() {
     await RegressionSuite.Configuration.writeJson("configuration_99.json", {
+      schema: 1,
       pipelines: [
         {
           id: Bun.randomUUIDv7(),

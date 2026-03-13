@@ -47,7 +47,7 @@
 * ✅ Check if the `*Converter` classes can be made part of the Drizzle entity definition
 * ✅ Allow env var references on all text fields via the ${...} syntax (on the right side; give an overview of detected env vars in orange; this also requires updating descriptions)
 * ✅ Rework timezones
-* Implement a top-level `schema` number on the configuration object
+* ✅ Implement a top-level `schema` number on the configuration object
 * Upgrade all dependencies
 
 ### Polish

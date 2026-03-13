@@ -11,6 +11,7 @@ export type Configuration = Configuration.Core & {
 
 export namespace Configuration {
   export type Core = {
+    schema: 1;
     pipelines: Pipeline[];
     schedules: Schedule.Core[];
     notificationPolicies: NotificationPolicy.Core[];
@@ -18,6 +19,7 @@ export namespace Configuration {
   export namespace Core {
     export function empty(): Core {
       return {
+        schema: 1,
         pipelines: [],
         schedules: [],
         notificationPolicies: [],
@@ -35,6 +37,7 @@ export namespace Configuration {
       // Record<keyof Core, ...> ensures every Core key is covered.
       // Adding a property to Core without updating this will cause a type error.
       const checks: Record<keyof Core, boolean> = {
+        schema: true,
         pipelines: isEmptyArray(s.pipelines),
         schedules: isEmptyArray(s.schedules),
         notificationPolicies: isEmptyArray(s.notificationPolicies),
@@ -45,6 +48,7 @@ export namespace Configuration {
     export const parse = ZodParser.forType<Core>()
       .ensureSchemaMatchesType(() =>
         z.object({
+          schema: z.literal(1),
           pipelines: z.array(Pipeline.parse.SCHEMA),
           schedules: z.array(Schedule.Core.parse.SCHEMA),
           notificationPolicies: z.array(NotificationPolicy.Core.parse.SCHEMA),
