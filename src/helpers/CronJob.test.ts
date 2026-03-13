@@ -70,7 +70,7 @@ describe(CronJob.name, async () => {
     "", // empty
     "potato", // ridiculous
     "* * * *", // too few fields
-    "* * * * * * *", // too many fields
+    "* * * * * * * * * *", // too many fields
     "60 * * * *", // minute out of range (0-59)
     "* 24 * * *", // hour out of range (0-23)
     "* * 32 * *", // day out of range (1-31)
