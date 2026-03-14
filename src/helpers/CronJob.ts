@@ -56,11 +56,6 @@ export class CronJob {
       amount: 1,
     });
     const delay = next.since(now).total("milliseconds");
-    console.log({
-      now: now.toString(),
-      next: next.toString(),
-      delay,
-    });
     this.timeoutToken = setTimeout(
       () => {
         if (delay <= this.maxDelay) {
