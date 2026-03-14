@@ -4,15 +4,17 @@ import { z } from "zod/v4";
 import packageJson from "../package.json";
 import { TimeZone } from "./helpers/TimeZone";
 import { LogLevel } from "./models/LogLevel";
+import { SupportToken } from "./support/SupportToken";
 
 export namespace Env {
   const baseEnv = z.object({
     O_BRESPI_STAGE: z.enum(["development", "e2etest", "production"]),
-    X_BRESPI_ROOT: z.string(),
-    X_BRESPI_LOGGING: z.enum(LogLevel),
     O_BRESPI_TIMEZONE: z.string().refine((tz) => TimeZone.check(tz), {
       error: "invalid_timezone",
     }),
+    X_BRESPI_ROOT: z.string(),
+    X_BRESPI_LOGGING: z.enum(LogLevel),
+    X_BRESPI_SUPPORT_TOKEN: z.string().optional(),
     X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: z.enum(["true", "false"]),
   });
   export function initialize(timezone = Temporal.Now.timeZoneId() as "UTC", environment = Bun.env as z.output<typeof baseEnv>) {
@@ -23,12 +25,13 @@ export namespace Env {
       .transform((env) => ({
         ...env,
         X_BRESPI_ROOT: isAbsolute(env.X_BRESPI_ROOT) ? env.X_BRESPI_ROOT : join(process.cwd(), env.X_BRESPI_ROOT),
+        X_BRESPI_SUPPORT_TOKEN: env.X_BRESPI_SUPPORT_TOKEN ? SupportToken.validate(env.X_BRESPI_SUPPORT_TOKEN) : undefined,
       }))
       .transform((env) => {
         const data = "data";
         return {
           ...env,
-          O_BRESPI_COMMIT: packageJson.commit,
+          O_BRESPI_COMMIT: packageJson.commit.slice(0, 7),
           O_BRESPI_VERSION: packageJson.version,
           O_BRESPI_CONFIGURATION: join(env.X_BRESPI_ROOT, "config.json"),
           X_BRESPI_HTPASSWD: join(env.X_BRESPI_ROOT, ".htpasswd"),

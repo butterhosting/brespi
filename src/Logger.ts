@@ -19,10 +19,12 @@ export class Logger {
   }
 
   private readonly filename: string;
+  private readonly lazy: boolean;
 
-  public constructor(file: string) {
-    if (!Logger.globalLogLevel) {
-      throw new Error("Logger must be initialized first");
+  public constructor(file: string, lazyArg?: "lazy") {
+    this.lazy = lazyArg === "lazy";
+    if (!this.lazy) {
+      this.requireInitialization();
     }
     this.filename = basename(file);
   }
@@ -44,10 +46,19 @@ export class Logger {
   };
 
   private log = (level: LogLevel, ...args: unknown[]) => {
+    if (this.lazy) {
+      this.requireInitialization();
+    }
     if (this.shouldLog(level)) {
       const timestamp = Temporal.Now.plainDateTimeISO(Logger.timeZone).toString({ smallestUnit: "second" }).replace("T", " ");
       const prefix = `${timestamp} [${level.toUpperCase()}] ${Logger.emojis[level]} ${this.filename} |`;
       console[level].call(console, prefix, ...args);
+    }
+  };
+
+  private requireInitialization = () => {
+    if (!Logger.globalLogLevel) {
+      throw new Error("Logger must be initialized first");
     }
   };
 

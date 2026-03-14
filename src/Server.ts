@@ -276,11 +276,20 @@ export class Server {
         `  \x1b[1mServer\x1b[0m    ${server.url}`,
         "",
         `  \x1b[1mStage\x1b[0m     ${this.env.O_BRESPI_STAGE}`,
-        `  \x1b[1mVersion\x1b[0m   ${this.env.O_BRESPI_VERSION}`,
         `  \x1b[1mCommit\x1b[0m    ${this.env.O_BRESPI_COMMIT}`,
+        `  \x1b[1mVersion\x1b[0m   ${this.env.O_BRESPI_VERSION}`,
         "",
         `  \x1b[1mLogging\x1b[0m   ${this.env.X_BRESPI_LOGGING}`,
         `  \x1b[1mTimezone\x1b[0m  ${this.env.O_BRESPI_TIMEZONE}`,
+        "",
+        ...(this.env.X_BRESPI_SUPPORT_TOKEN
+          ? [
+              `  \x1b[1mMode\x1b[0m      Running with love ❤️`, //
+            ]
+          : [
+              `  \x1b[1mMode\x1b[0m      Running normally`, //
+              `            https://butterhost.ing/brespi/with-love`, //
+            ]),
         "",
       ].join("\n"),
     );
