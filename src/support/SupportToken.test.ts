@@ -6,7 +6,7 @@ import { SupportToken } from "./SupportToken";
 
 describe("SupportToken", async () => {
   const keys = {
-    // Private key was converted once from the OpenSSH format to PKCS8 PEM
+    // this private key was converted once from the OpenSSH format to PKCS8 PEM
     private: "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIF6JdTbY1BmzmSd/dPmWBc64lAzRPJq5s3bltwrnC/G5\n-----END PRIVATE KEY-----",
     public: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILU3AARwGfPLsWOI08fK+ZC6cilnqr05Y/7M5mzqwx8K",
   };

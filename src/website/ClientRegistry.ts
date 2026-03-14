@@ -42,13 +42,7 @@ export class ClientRegistry {
       Object.entries(envCopy).forEach(([key, value]) => {
         result += `${key.padEnd(longestKey + 1)}: ${value}\n`;
       });
-      console.info(
-        "%cBrespi%s\n\n%c%s",
-        "font-size: 24px; font-weight: 800;",
-        env.O_BRESPI_SUPPORTER ? " ❤️" : "",
-        "font-size: 12px; font-weight: normal",
-        result,
-      );
+      console.info("%cBrespi\n\n%c%s", "font-size: 24px; font-weight: 800;", "font-size: 12px; font-weight: normal", result);
     }
   }
 
