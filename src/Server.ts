@@ -282,13 +282,13 @@ export class Server {
         `  \x1b[1mLogging\x1b[0m   ${this.env.X_BRESPI_LOGGING}`,
         `  \x1b[1mTimezone\x1b[0m  ${this.env.O_BRESPI_TIMEZONE}`,
         "",
-        ...(this.env.X_BRESPI_SUPPORT_TOKEN
+        ...(this.env.O_BRESPI_SUPPORTER
           ? [
               `  \x1b[1mMode\x1b[0m      Running with love ❤️`, //
             ]
           : [
               `  \x1b[1mMode\x1b[0m      Running normally`, //
-              `            https://butterhost.ing/brespi/with-love`, //
+              `            https://butterhost.ing/brespi/love`, //
             ]),
         "",
       ].join("\n"),

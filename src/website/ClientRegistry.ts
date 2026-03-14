@@ -28,7 +28,7 @@ export class ClientRegistry {
   }
 
   private static printEnv(env: Env.Public) {
-    const envCopy: OmitBetter<Env.Public, "O_BRESPI_CONFIGURATION"> = {
+    const envCopy: OmitBetter<Env.Public, "O_BRESPI_CONFIGURATION" | "O_BRESPI_SUPPORTER"> = {
       O_BRESPI_STAGE: env.O_BRESPI_STAGE,
       O_BRESPI_VERSION: env.O_BRESPI_VERSION,
       O_BRESPI_COMMIT: env.O_BRESPI_COMMIT,
@@ -42,7 +42,13 @@ export class ClientRegistry {
       Object.entries(envCopy).forEach(([key, value]) => {
         result += `${key.padEnd(longestKey + 1)}: ${value}\n`;
       });
-      console.info("%cBrespi\n\n%c%s", "font-size: 24px; font-weight: 800;", "font-size: 12px; font-weight: normal", result);
+      console.info(
+        "%cBrespi%s\n\n%c%s",
+        "font-size: 24px; font-weight: 800;",
+        env.O_BRESPI_SUPPORTER ? " ❤️" : "",
+        "font-size: 12px; font-weight: normal",
+        result,
+      );
     }
   }
 

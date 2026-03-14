@@ -22,10 +22,10 @@ export namespace Env {
       throw new Error(`Invalid timezone: ${timezone}`);
     }
     return baseEnv
-      .transform((env) => ({
+      .transform(({ X_BRESPI_ROOT, X_BRESPI_SUPPORT_TOKEN, ...env }) => ({
         ...env,
-        X_BRESPI_ROOT: isAbsolute(env.X_BRESPI_ROOT) ? env.X_BRESPI_ROOT : join(process.cwd(), env.X_BRESPI_ROOT),
-        X_BRESPI_SUPPORT_TOKEN: env.X_BRESPI_SUPPORT_TOKEN ? SupportToken.validate(env.X_BRESPI_SUPPORT_TOKEN) : undefined,
+        X_BRESPI_ROOT: isAbsolute(X_BRESPI_ROOT) ? X_BRESPI_ROOT : join(process.cwd(), X_BRESPI_ROOT),
+        O_BRESPI_SUPPORTER: Boolean(X_BRESPI_SUPPORT_TOKEN && SupportToken.validate(X_BRESPI_SUPPORT_TOKEN)),
       }))
       .transform((env) => {
         const data = "data";
