@@ -100,6 +100,8 @@ export namespace TestEnvironment {
       O_BRESPI_TIMEZONE: "UTC",
       X_BRESPI_ROOT: join(unitTestRoot, "brespi"),
       X_BRESPI_LOGGING: LogLevel.warn,
+      X_BRESPI_VERIFICATION_KEY:
+        "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAalpLQu9Fkn/R3WylORAad6UB0XAOowFIjF2/FwAyjpc=\n-----END PUBLIC KEY-----",
       X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: "false",
     });
 

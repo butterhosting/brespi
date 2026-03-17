@@ -15,6 +15,7 @@ export namespace Env {
     X_BRESPI_ROOT: z.string(),
     X_BRESPI_LOGGING: z.enum(LogLevel),
     X_BRESPI_SUPPORT_TOKEN: z.string().optional(),
+    X_BRESPI_VERIFICATION_KEY: z.string().transform((str) => str.replaceAll("\\n", "\n")),
     X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: z.enum(["true", "false"]),
   });
   export function initialize(timezone = Temporal.Now.timeZoneId() as "UTC", environment = Bun.env as z.output<typeof baseEnv>) {
@@ -22,10 +23,10 @@ export namespace Env {
       throw new Error(`Invalid timezone: ${timezone}`);
     }
     return baseEnv
-      .transform(({ X_BRESPI_ROOT, X_BRESPI_SUPPORT_TOKEN, ...env }) => ({
+      .transform(({ X_BRESPI_ROOT, X_BRESPI_SUPPORT_TOKEN, X_BRESPI_VERIFICATION_KEY, ...env }) => ({
         ...env,
         X_BRESPI_ROOT: isAbsolute(X_BRESPI_ROOT) ? X_BRESPI_ROOT : join(process.cwd(), X_BRESPI_ROOT),
-        O_BRESPI_SUPPORTER: Boolean(X_BRESPI_SUPPORT_TOKEN && SupportToken.validate(X_BRESPI_SUPPORT_TOKEN)),
+        O_BRESPI_SUPPORTER: Boolean(SupportToken.verify({ hexToken: X_BRESPI_SUPPORT_TOKEN, publicKey: X_BRESPI_VERIFICATION_KEY })),
       }))
       .transform((env) => {
         const data = "data";

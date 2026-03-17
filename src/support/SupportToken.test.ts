@@ -5,10 +5,9 @@ import crypto from "crypto";
 import { SupportToken } from "./SupportToken";
 
 describe("SupportToken", async () => {
-  const keys = {
-    // this private key was converted once from the OpenSSH format to PKCS8 PEM
-    private: "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIF6JdTbY1BmzmSd/dPmWBc64lAzRPJq5s3bltwrnC/G5\n-----END PRIVATE KEY-----",
-    public: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILU3AARwGfPLsWOI08fK+ZC6cilnqr05Y/7M5mzqwx8K",
+  const Key = {
+    private: "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIHJKi9pEnwwX/RLR3EPWc7ln2SWAZj6o3Q1YkbyrWdf5\n-----END PRIVATE KEY-----",
+    public: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAalpLQu9Fkn/R3WylORAad6UB0XAOowFIjF2/FwAyjpc=\n-----END PUBLIC KEY-----",
   };
 
   beforeAll(async () => {
@@ -19,10 +18,10 @@ describe("SupportToken", async () => {
     // given
     const token = sign("v=1;t=1773490583;app=brespi;amt=1000;cur=usd");
     // when
-    const loveToken = SupportToken.validate(encode(token), keys.public);
+    const supportToken = SupportToken.verify({ hexToken: encode(token), publicKey: Key.public });
     // then
-    expect(loveToken).toBeDefined();
-    expect(loveToken).toEqual({
+    expect(supportToken).toBeDefined();
+    expect(supportToken).toEqual({
       app: "brespi",
       amount: 1000,
       currency: "usd",
@@ -32,21 +31,21 @@ describe("SupportToken", async () => {
 
   it("returns undefined for an invalid signature", () => {
     const token = "v=1;t=1773490583;app=brespi;amt=1000;cur=usd;s=aW52YWxpZA==";
-    expect(SupportToken.validate(encode(token), keys.public)).toBeUndefined();
+    expect(SupportToken.verify({ hexToken: encode(token), publicKey: Key.public })).toBeUndefined();
   });
 
   it("returns undefined for a tampered payload", () => {
     const token = sign("v=1;t=1773490583;app=brespi;amt=1000;cur=usd");
     const tampered = token.replace("amt=1000", "amt=9999");
-    expect(SupportToken.validate(encode(tampered), keys.public)).toBeUndefined();
+    expect(SupportToken.verify({ hexToken: encode(tampered), publicKey: Key.public })).toBeUndefined();
   });
 
   it("returns undefined for a malformed token", () => {
-    expect(SupportToken.validate(encode("garbage"), keys.public)).toBeUndefined();
+    expect(SupportToken.verify({ hexToken: encode("garbage"), publicKey: Key.public })).toBeUndefined();
   });
 
   function sign(payload: string): string {
-    const key = crypto.createPrivateKey({ key: keys.private, format: "pem" });
+    const key = crypto.createPrivateKey(Key.private);
     const signature = crypto.sign(null, Buffer.from(payload), key);
     return `${payload};s=${signature.toString("base64")}`;
   }
