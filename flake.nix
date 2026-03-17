@@ -10,13 +10,9 @@
     in {
       devShells.${system}.default = pkgs.mkShell {
         packages = [
-          pkgs.bun
-          pkgs.nodejs_24
+          pkgs.bun         # Bun
+          pkgs.nodejs_24   # Node (for Playwright)
         ];
-        shellHook = ''
-          echo "📟 bun"
-          echo "📟 node (for Playwright)"
-        '';
       };
     };
 }
