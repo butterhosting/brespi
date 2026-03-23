@@ -199,7 +199,6 @@ cmd_hash() {
 
 cmd_version_list() {
     git --no-pager tag --sort=-version:refname 2>/dev/null || true
-    printf "0.0.0\n"
 }
 
 # --- routing ---
