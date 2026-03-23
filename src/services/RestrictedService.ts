@@ -80,7 +80,7 @@ export class RestrictedService {
             format: "properties",
             properties: {
               bucket: "bucko",
-              endpoint: "http://s3:4566",
+              endpoint: "http://s3:9090",
               accessKey: "${MY_S3_ACCESS_KEY}",
               secretKey: "${MY_S3_SECRET_KEY}",
             },
@@ -167,7 +167,7 @@ export class RestrictedService {
             format: "properties",
             properties: {
               bucket: "bucko",
-              endpoint: "http://s3:4566",
+              endpoint: "http://s3:9090",
               accessKey: "${MY_S3_ACCESS_KEY}",
               secretKey: "${MY_S3_SECRET_KEY}",
             },

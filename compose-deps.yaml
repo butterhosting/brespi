@@ -25,11 +25,11 @@ services:
       - app-network
 
   s3:
-    image: localstack/localstack:s3-latest
+    image: adobe/s3mock
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: "bucko"
     ports:
-      - "4566:4566"
-    volumes:
-      - ./compose-init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+      - "9090:9090"
     networks:
       - app-network
 

@@ -59,7 +59,7 @@ describe(AdapterService.name, () => {
         format: "properties",
         properties: {
           bucket: "bucko",
-          endpoint: "http://s3:4566",
+          endpoint: "http://s3:9090",
           accessKey: "${MY_S3_ACCESS_KEY}",
           secretKey: "my-plaintext-secret",
         },
