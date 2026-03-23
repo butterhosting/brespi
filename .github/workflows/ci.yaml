@@ -30,14 +30,14 @@ jobs:
           bun install
           bun install:browsers
 
-      # - name: "Application :: Type Checking"
-      #   run: bun tc
+      - name: "Application :: Type Checking"
+        run: bun tc
 
-      # - name: "Application :: Unit Tests"
-      #   run: bun test:unit
+      - name: "Application :: Unit Tests"
+        run: bun test:unit
 
-      # - name: "Application :: Regression Tests"
-      #   run: bun test:regression
+      - name: "Application :: Regression Tests"
+        run: bun test:regression
 
       # - name: "Application :: Deployment Tests"
       #   run: bun test:deployment
