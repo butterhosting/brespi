@@ -44,6 +44,7 @@ export default defineConfig({
   /* Build and start the production image before running tests */
   webServer: {
     command: [
+      "mkdir -p opt",
       "./brespi image create --postgresql --mariadb --stage e2e",
       process.env.CI
         ? `HOST_UID=${process.getuid!()} HOST_GID=${process.getgid!()} docker compose -f compose-e2e.yaml up`

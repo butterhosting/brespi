@@ -17,3 +17,10 @@ services:
       MY_S3_SECRET_KEY: test
     networks:
       - app-network
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
+      s3:
+        condition: service_healthy

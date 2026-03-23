@@ -10,6 +10,11 @@ services:
       - ./seeds/postgresql:/docker-entrypoint-initdb.d
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgresql"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
 
   mariadb:
     image: "mariadb:11"
@@ -23,6 +28,11 @@ services:
       - ./seeds/mariadb:/docker-entrypoint-initdb.d
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
 
   s3:
     image: adobe/s3mock
@@ -32,6 +42,11 @@ services:
       - "9090:9090"
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
 
 networks:
   app-network:
