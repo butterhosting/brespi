@@ -22,5 +22,5 @@ services:
         condition: service_healthy
       mariadb:
         condition: service_healthy
-      s3:
-        condition: service_healthy
+      s3_init:
+        condition: service_completed_successfully

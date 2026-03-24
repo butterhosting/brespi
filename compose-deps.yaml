@@ -50,7 +50,7 @@ services:
       timeout: 10s
       retries: 10
 
-  s3-setup:
+  s3_init:
     image: amazon/aws-cli
     depends_on:
       s3:

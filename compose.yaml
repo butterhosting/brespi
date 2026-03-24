@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ${START_COMMAND:-bun start:dev}
+    command: bun start:dev
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     ports:
       - "3000:3000"
@@ -28,5 +28,5 @@ services:
         condition: service_healthy
       mariadb:
         condition: service_healthy
-      s3:
-        condition: service_healthy
+      s3_init:
+        condition: service_completed_successfully
