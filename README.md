@@ -1,4 +1,4 @@
-# Brespi: Backup and Restore Pipelines for Self-Hosters
+# Brespi: Visual Backup and Restore Automation for Self-Hosters
 
 ![backup pipeline containing steps for backing up postgresql, compression, encryption and uploading to S3](.readme/hero.png)
 
