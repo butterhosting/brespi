@@ -9,6 +9,7 @@
   "scripts": {
     "drizzle": "sh -c ': \"${1:?Please pass a migration name}\"; bunx drizzle-kit generate --name=$1 --custom' _",
     "install:browsers": "playwright install chromium --with-deps",
+    "dev": "docker compose up",
     "tc": "bunx tsc --noEmit",
     "test:unit": "bun test --test-name-pattern='^(?!regression)'",
     "test:regression": "bun test --test-name-pattern='^regression'",

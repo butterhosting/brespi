@@ -35,18 +35,34 @@ services:
       retries: 10
 
   s3:
-    image: adobe/s3mock
+    image: rustfs/rustfs
     environment:
-      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: "bucko"
+      RUSTFS_ACCESS_KEY: test
+      RUSTFS_SECRET_KEY: test
     ports:
-      - "9090:9090"
+      - "9000:9000"
+      - "9001:9001"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090"]
+      test: ["CMD-SHELL", "curl -s -o /dev/null http://localhost:9000/"]
       interval: 1s
       timeout: 10s
       retries: 10
+
+  s3-setup:
+    image: amazon/aws-cli
+    depends_on:
+      s3:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - app-network
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    entrypoint: [""]
+    command: ["aws", "--endpoint-url", "http://s3:9000", "s3", "mb", "s3://bucko"]
 
 networks:
   app-network:

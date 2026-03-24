@@ -5,13 +5,13 @@ export namespace S3Boundary {
     connectionFormat: "properties" as const,
     bucket: "bucko",
     region: "eu-central-1",
-    endpoint: "http://s3:9090",
+    endpoint: "http://s3:9000",
     accessKey: "${MY_S3_ACCESS_KEY}",
     secretKey: "${MY_S3_SECRET_KEY}",
   };
 
   const client = new S3Client({
-    endpoint: "http://localhost:9090",
+    endpoint: "http://localhost:9000",
     region: connectionDefaults.region,
     credentials: {
       accessKeyId: "test",
