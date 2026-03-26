@@ -45,6 +45,7 @@
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.8",
     "mariadb": "^3.5.2",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "typescript": "^5.9.3"
   }
 }

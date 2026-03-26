@@ -59,7 +59,6 @@ export class ClientRegistry {
     this.registry[DialogClient.name] = new DialogClient();
     this.registry[StepClient.name] = new StepClient(yesttp);
     this.registry[PipelineClient.name] = new PipelineClient(yesttp);
-    this.registry[PipelineClient.name] = new PipelineClient(yesttp);
     this.registry[ScheduleClient.name] = new ScheduleClient(yesttp);
     this.registry[ExecutionClient.name] = new ExecutionClient(yesttp);
     this.registry[ConfigurationClient.name] = new ConfigurationClient(yesttp);

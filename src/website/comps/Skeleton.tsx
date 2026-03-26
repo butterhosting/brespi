@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 import { RestrictedClient } from "../clients/RestrictedClient";
 import { useConfiguration } from "../hooks/useConfiguration";
 import { useRegistry } from "../hooks/useRegistry";
+import { Route } from "../Route";
 import { Paper } from "./Paper";
 
 type Props = ComponentProps<"main">;
@@ -23,10 +24,10 @@ export namespace Skeleton {
     const { data } = useConfiguration();
 
     const navigationLinks = [
-      { title: "Pipelines", link: "/pipelines", rounding: "left" },
-      { title: "Schedules", link: "/schedules", rounding: undefined },
-      { title: "Notifications", link: "/notifications", rounding: undefined },
-      { title: "Configuration", link: "/configuration", rounding: "right" },
+      { title: "Pipelines", link: `/${Route.pipelines()}`, rounding: "left" },
+      { title: "Schedules", link: `/${Route.schedules()}`, rounding: undefined },
+      { title: "Notifications", link: `/${Route.notifications()}`, rounding: undefined },
+      { title: "Configuration", link: `/${Route.configuration()}`, rounding: "right" },
     ] as const;
 
     return (

@@ -3,7 +3,7 @@ import { Execution } from "@/models/Execution";
 import { NotificationPolicy } from "@/models/NotificationPolicy";
 import { Pipeline } from "@/models/Pipeline";
 import { Schedule } from "@/models/Schedule";
-import { Temporal } from "node_modules/@js-temporal/polyfill/index.cjs";
+import { Temporal } from "@js-temporal/polyfill";
 
 export type Event =
   // configuration
