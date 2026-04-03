@@ -1,6 +1,6 @@
 import { Schedule } from "@/models/Schedule";
 import { OmitBetter } from "@/types/OmitBetter";
-import { PipelineView } from "@/views/PipelineView";
+import { PipelineRM } from "@/models/PipelineRM";
 import clsx from "clsx";
 import { useState } from "react";
 import { PipelineClient } from "../clients/PipelineClient";
@@ -200,7 +200,7 @@ export namespace Internal {
   export type ScheduleVisualization = Schedule & {
     pipelineName: string;
   };
-  export function convertToVisualization(schedule: Schedule, pipelines: PipelineView[]): ScheduleVisualization {
+  export function convertToVisualization(schedule: Schedule, pipelines: PipelineRM[]): ScheduleVisualization {
     const pipeline = pipelines.find((p) => p.id === schedule.pipelineId);
     if (!pipeline) {
       throw new Error(`Pipeline not found for schedule; pipelineId=${schedule.pipelineId}`);

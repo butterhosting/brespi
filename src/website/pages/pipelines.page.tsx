@@ -2,7 +2,7 @@ import { Prettify } from "@/helpers/Prettify";
 import { Outcome } from "@/models/Outcome";
 import { ProblemDetails } from "@/models/ProblemDetails";
 import { ServerMessage } from "@/socket/ServerMessage";
-import { PipelineView } from "@/views/PipelineView";
+import { PipelineRM } from "@/models/PipelineRM";
 import { Temporal } from "@js-temporal/polyfill";
 import clsx from "clsx";
 import { useEffect } from "react";
@@ -116,7 +116,7 @@ export namespace Internal {
     subtitle?: string;
     icon: ExecutionIcon.Props["variant"];
   };
-  export function convertToVisualization({ id, name, lastExecution }: PipelineView, timeZone: string): PipelineVisualization {
+  export function convertToVisualization({ id, name, lastExecution }: PipelineRM, timeZone: string): PipelineVisualization {
     let subtitle = "";
     let icon: PipelineVisualization["icon"];
     if (lastExecution) {

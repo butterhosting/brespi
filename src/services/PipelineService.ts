@@ -7,7 +7,7 @@ import { Pipeline } from "@/models/Pipeline";
 import { Step } from "@/models/Step";
 import { ExecutionRepository } from "@/repositories/ExecutionRepository";
 import { PipelineRepository } from "@/repositories/PipelineRepository";
-import { PipelineView } from "@/views/PipelineView";
+import { PipelineRM } from "@/models/PipelineRM";
 import z from "zod/v4";
 import { StepService } from "./StepService";
 
@@ -19,12 +19,12 @@ export class PipelineService {
     private readonly stepService: StepService,
   ) {}
 
-  public async query(): Promise<PipelineView[]> {
+  public async query(): Promise<PipelineRM[]> {
     const pipelines = await this.pipelineRepository.query();
     return await this.enhance(pipelines);
   }
 
-  public async find(id: string): Promise<PipelineView> {
+  public async find(id: string): Promise<PipelineRM> {
     const pipeline = await this.pipelineRepository.findById(id);
     if (!pipeline) {
       throw PipelineError.not_found({ id });
@@ -32,7 +32,7 @@ export class PipelineService {
     return await this.enhance(pipeline);
   }
 
-  public async create(unknown: z.output<typeof PipelineService.Upsert>): Promise<PipelineView> {
+  public async create(unknown: z.output<typeof PipelineService.Upsert>): Promise<PipelineRM> {
     const pipeline = await this.pipelineRepository.create(
       this.validate({
         id: Bun.randomUUIDv7(),
@@ -44,7 +44,7 @@ export class PipelineService {
     return await this.enhance(pipeline);
   }
 
-  public async update(id: string, unknown: z.output<typeof PipelineService.Upsert>): Promise<PipelineView> {
+  public async update(id: string, unknown: z.output<typeof PipelineService.Upsert>): Promise<PipelineRM> {
     const pipeline = await this.pipelineRepository.update(
       this.validate({
         id,
@@ -56,21 +56,21 @@ export class PipelineService {
     return await this.enhance(pipeline);
   }
 
-  public async delete(id: string): Promise<PipelineView> {
+  public async delete(id: string): Promise<PipelineRM> {
     const pipeline = await this.pipelineRepository.delete(id);
     this.eventBus.publish(Event.Type.pipeline_deleted, { pipeline });
     return await this.enhance(pipeline);
   }
 
-  private async enhance(pipeline: Pipeline): Promise<PipelineView>;
-  private async enhance(pipelines: Pipeline[]): Promise<PipelineView[]>;
-  private async enhance(arg: Pipeline | Pipeline[]): Promise<PipelineView | PipelineView[]> {
+  private async enhance(pipeline: Pipeline): Promise<PipelineRM>;
+  private async enhance(pipelines: Pipeline[]): Promise<PipelineRM[]>;
+  private async enhance(arg: Pipeline | Pipeline[]): Promise<PipelineRM | PipelineRM[]> {
     const isArray = Array.isArray(arg);
     const pipelines: Pipeline[] = isArray ? arg : [arg];
     const lastExecutionOutcomes = await this.executionRepository.queryMostRecentExecutions({
       pipelineIds: pipelines.map(({ id }) => id),
     });
-    const pipelineViews: PipelineView[] = pipelines.map((p) => ({
+    const pipelineViews: PipelineRM[] = pipelines.map((p) => ({
       ...p,
       lastExecution: lastExecutionOutcomes.get(p.id)!,
     }));

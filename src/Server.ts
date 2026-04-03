@@ -18,7 +18,7 @@ import { RestrictedService } from "./services/RestrictedService";
 import { ScheduleService } from "./services/ScheduleService";
 import { StepService } from "./services/StepService";
 import { Socket } from "./socket/Socket";
-import { PipelineView } from "./views/PipelineView";
+import { PipelineRM } from "./models/PipelineRM";
 import { Temporal } from "@js-temporal/polyfill";
 import { Prettify } from "./helpers/Prettify";
 import { Logger } from "./Logger";
@@ -134,25 +134,25 @@ export class Server {
          */
         "/api/pipelines": {
           GET: this.handleRoute(async () => {
-            const pipelines: PipelineView[] = await this.pipelineService.query();
+            const pipelines: PipelineRM[] = await this.pipelineService.query();
             return Response.json(pipelines);
           }),
           POST: this.handleRoute(async (request) => {
-            const pipeline: PipelineView = await this.pipelineService.create(await request.json());
+            const pipeline: PipelineRM = await this.pipelineService.create(await request.json());
             return Response.json(pipeline);
           }),
         },
         "/api/pipelines/:id": {
           GET: this.handleRoute(async (request) => {
-            const pipeline: PipelineView = await this.pipelineService.find(request.params.id);
+            const pipeline: PipelineRM = await this.pipelineService.find(request.params.id);
             return Response.json(pipeline);
           }),
           PUT: this.handleRoute(async (request) => {
-            const pipeline: PipelineView = await this.pipelineService.update(request.params.id, await request.json());
+            const pipeline: PipelineRM = await this.pipelineService.update(request.params.id, await request.json());
             return Response.json(pipeline);
           }),
           DELETE: this.handleRoute(async (request) => {
-            const pipeline: PipelineView = await this.pipelineService.delete(request.params.id);
+            const pipeline: PipelineRM = await this.pipelineService.delete(request.params.id);
             return Response.json(pipeline);
           }),
         },

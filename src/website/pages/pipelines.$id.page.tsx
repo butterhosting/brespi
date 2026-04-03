@@ -6,7 +6,7 @@ import { Pipeline } from "@/models/Pipeline";
 import { ProblemDetails } from "@/models/ProblemDetails";
 import { Step } from "@/models/Step";
 import { ServerMessage } from "@/socket/ServerMessage";
-import { PipelineView } from "@/views/PipelineView";
+import { PipelineRM } from "@/models/PipelineRM";
 import { Temporal } from "@js-temporal/polyfill";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef } from "react";
@@ -57,7 +57,7 @@ export function pipelines$idPage() {
   /**
    * Data
    */
-  const pipelineQuery = useYesQuery<"new" | PipelineView, ProblemDetails>(
+  const pipelineQuery = useYesQuery<"new" | PipelineRM, ProblemDetails>(
     {
       async queryFn() {
         if (id === "new") {
@@ -105,7 +105,7 @@ export function pipelines$idPage() {
   /**
    * General reset function (invoked initially, or after saving)
    */
-  const reset = (initial: "new" | PipelineView) => {
+  const reset = (initial: "new" | PipelineRM) => {
     // Reset the main form
     if (initial === "new") {
       mainForm.reset({
