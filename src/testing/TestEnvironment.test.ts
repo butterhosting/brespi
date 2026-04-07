@@ -2,7 +2,7 @@ import { AdapterService } from "@/adapters/AdapterService";
 import { FilterCapability } from "@/capabilities/filter/FilterCapability";
 import { ManagedStorageCapability } from "@/capabilities/managedstorage/ManagedStorageCapability";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
-import { initializeSqlite, Sqlite } from "@/drizzle/sqlite";
+import { Sqlite } from "@/drizzle/sqlite";
 import { Env } from "@/Env";
 import { EventBus } from "@/events/EventBus";
 import { TempDestination } from "@/helpers/TempDestination";
@@ -118,7 +118,7 @@ export namespace TestEnvironment {
     cleanupTasks.push(() => rm(unitTestRoot, { recursive: true, force: true }));
 
     // Setup SQLite
-    const sqlite = await initializeSqlite(env);
+    const sqlite = await Sqlite.initialize(env);
     cleanupTasks.push(() => sqlite.close());
 
     // Mock registration

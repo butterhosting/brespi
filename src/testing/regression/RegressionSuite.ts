@@ -4,7 +4,7 @@ import { ManagedStorageCapability } from "@/capabilities/managedstorage/ManagedS
 import { Version } from "@/capabilities/managedstorage/Version";
 import * as schema from "@/drizzle/schema";
 import { $action, $execution, $notificationPolicyMetadata, $scheduleMetadata } from "@/drizzle/schema";
-import { initializeSqlite, Sqlite } from "@/drizzle/sqlite";
+import { Sqlite } from "@/drizzle/sqlite";
 import { Env } from "@/Env";
 import { Artifact } from "@/models/Artifact";
 import { Configuration as ModelConfiguration } from "@/models/Configuration";
@@ -175,7 +175,7 @@ export namespace RegressionSuite {
       }
       const databaseCopyPath = join(Path.suiteTmp, "db.sqlite");
       await Bun.write(databaseCopyPath, file);
-      return await initializeSqlite({ X_BRESPI_DATABASE: databaseCopyPath } as Env.Private);
+      return await Sqlite.initialize({ X_BRESPI_DATABASE: databaseCopyPath } as Env.Private);
     }
     export async function insertIntoRegressionDatabase({
       $execution: executions,
@@ -187,7 +187,7 @@ export namespace RegressionSuite {
       if (await file.exists()) {
         await file.delete();
       }
-      const sqlite = await initializeSqlite({ X_BRESPI_DATABASE: databasePath } as Env.Private);
+      const sqlite = await Sqlite.initialize({ X_BRESPI_DATABASE: databasePath } as Env.Private);
       if (executions.length > 0) {
         await sqlite.insert($execution).values(executions);
       }

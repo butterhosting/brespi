@@ -4,18 +4,21 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "./schema";
 
-export async function initializeSqlite(env: Env.Private) {
-  const database = new Database(env.X_BRESPI_DATABASE, { create: true });
-  const sqlite = drizzle(database, {
-    casing: "snake_case",
-    schema,
-  });
-  migrate(sqlite, {
-    migrationsFolder: "src/drizzle/migrations",
-  });
-  return Object.assign(sqlite, {
-    close: () => database.close(),
-  });
-}
+export type Sqlite = Awaited<ReturnType<typeof Sqlite.initialize>>;
 
-export type Sqlite = Awaited<ReturnType<typeof initializeSqlite>>;
+export namespace Sqlite {
+  export async function initialize(env: Env.Private) {
+    const database = new Database(env.X_BRESPI_DATABASE, { create: true });
+    const sqlite = drizzle(database, {
+      casing: "snake_case",
+      schema,
+    });
+    migrate(sqlite, {
+      migrationsFolder: "src/drizzle/migrations",
+    });
+    sqlite.run("PRAGMA foreign_keys = ON");
+    return Object.assign(sqlite, {
+      close: () => database.close(),
+    });
+  }
+}
