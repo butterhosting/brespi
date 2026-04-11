@@ -15,7 +15,7 @@ import { Sqlite } from "./drizzle/sqlite";
 import { Env } from "./Env";
 import { EventBus } from "./events/EventBus";
 import { BasicAuthMiddleware } from "./middleware/basicauth/BasicAuthMiddleware";
-import { LoggingMiddleware } from "./middleware/basicauth/LoggingMiddleware";
+import { LoggingMiddleware } from "./middleware/logging/LoggingMiddleware";
 import { Middleware } from "./middleware/Middleware";
 import { ConfigurationRepository } from "./repositories/ConfigurationRepository";
 import { ExecutionRepository } from "./repositories/ExecutionRepository";

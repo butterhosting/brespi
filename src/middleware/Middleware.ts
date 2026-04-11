@@ -1,5 +1,5 @@
 import { BasicAuthMiddleware } from "./basicauth/BasicAuthMiddleware";
-import { LoggingMiddleware } from "./basicauth/LoggingMiddleware";
+import { LoggingMiddleware } from "./logging/LoggingMiddleware";
 import { MiddlewareHandler } from "./MiddlewareHandler";
 
 export class Middleware {
