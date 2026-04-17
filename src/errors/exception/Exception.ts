@@ -52,7 +52,7 @@ export namespace Exception {
   export function isInstance(e: any): e is Exception;
   export function isInstance<D extends Record<string, Json> = Record<string, Json>>(e: any, specific?: Exception.Fn<D>): boolean {
     const marker = "namespace" satisfies keyof InstanceType<typeof Exception>;
-    const isException = marker in e && e[marker] === Exception.NAMESPACE;
+    const isException = typeof e === "object" && marker in e && e[marker] === Exception.NAMESPACE;
     if (!isException) {
       return false;
     }

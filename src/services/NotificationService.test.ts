@@ -8,12 +8,12 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { NotificationService } from "./NotificationService";
 
 describe(NotificationService.name, async () => {
-  let context!: TestEnvironment.Context;
-  let service!: NotificationService; // unused, because we communicate via the event bus
+  let context: TestEnvironment.Context;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();
-    service = new NotificationService(context.eventBus, context.notificationRepository, context.notificationDispatchServiceMock.cast());
+    // only used to setup event bus communication
+    new NotificationService(context.eventBus, context.notificationRepository, context.notificationDispatchServiceMock.cast());
   });
 
   it("dispatches a notification when event type and trigger match", async () => {

@@ -128,7 +128,7 @@ export class FilesystemAdapter extends AbstractAdapter {
     }
   }
 
-  public async folderFlatten(artifacts: Artifact[], step: Step.FolderFlatten): Promise<AdapterResult> {
+  public async folderFlatten(artifacts: Artifact[], _step: Step.FolderFlatten): Promise<AdapterResult> {
     this.log.debug(`Preparing to flatten artifacts; artifacts.length=${artifacts.length}`);
     const result: Artifact[] = [];
     for (const artifact of artifacts) {
@@ -143,7 +143,7 @@ export class FilesystemAdapter extends AbstractAdapter {
     return AdapterResult.create(result);
   }
 
-  public async folderGroup(artifacts: Artifact[], step: Step.FolderGroup): Promise<AdapterResult> {
+  public async folderGroup(artifacts: Artifact[], _step: Step.FolderGroup): Promise<AdapterResult> {
     this.log.debug(`Preparing to group artifacts; artifacts.length=${artifacts.length}`);
     const { outputId, outputPath } = this.generateArtifactDestination();
     await mkdir(outputPath);

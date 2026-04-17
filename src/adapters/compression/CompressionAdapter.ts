@@ -89,7 +89,7 @@ export class CompressionAdapter extends AbstractAdapter {
    *   # Move the single extracted item to final destination
    *   mv /temp/dir/extracted-item /final/destination
    */
-  public async decompress(artifact: Artifact, step: Step.Decompression): Promise<Artifact> {
+  public async decompress(artifact: Artifact, _step: Step.Decompression): Promise<Artifact> {
     this.requireArtifactType("file", artifact);
     this.log.debug(`Preparing to decompress; artifact=${artifact.name}`);
     const inputPath = artifact.path;

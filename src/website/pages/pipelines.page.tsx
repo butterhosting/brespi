@@ -1,13 +1,12 @@
 import { Prettify } from "@/helpers/Prettify";
 import { Outcome } from "@/models/Outcome";
+import { PipelineRM } from "@/models/PipelineRM";
 import { ProblemDetails } from "@/models/ProblemDetails";
 import { ServerMessage } from "@/socket/ServerMessage";
-import { PipelineRM } from "@/models/PipelineRM";
 import { Temporal } from "@js-temporal/polyfill";
 import clsx from "clsx";
 import { useEffect } from "react";
 import { Link } from "react-router";
-import { DialogClient } from "../clients/DialogClient";
 import { PipelineClient } from "../clients/PipelineClient";
 import { SocketClient } from "../clients/SocketClient";
 import { ErrorDump } from "../comps/ErrorDump";
@@ -55,20 +54,6 @@ export function pipelinesPage() {
     return () => clearInterval(token);
   }, [isSomePipelineExecuting]);
 
-  const dialogClient = useRegistry(DialogClient);
-  const doConfirm = async () => {
-    const result = await dialogClient.confirm({
-      render({ yesNoButtons }) {
-        return (
-          <div>
-            <p>Are you sure about deleting this?</p>
-            {yesNoButtons()}
-          </div>
-        );
-      },
-    });
-  };
-
   return (
     <Skeleton>
       <Paper className="col-span-full">
@@ -108,7 +93,7 @@ export function pipelinesPage() {
   );
 }
 
-export namespace Internal {
+namespace Internal {
   export type PipelineVisualization = {
     link: string;
     title: string;

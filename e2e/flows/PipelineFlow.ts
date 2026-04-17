@@ -118,7 +118,7 @@ export namespace PipelineFlow {
     // Draw arrows based on previousId relationships
     for (const step of options.steps) {
       if (step.previousId) {
-        await Subroutine.drawRelationArrow(page, stepLocators, {
+        await Subroutine.drawRelationArrow(stepLocators, {
           from: step.previousId,
           to: step.id || `step-${options.steps.indexOf(step)}`,
         });
@@ -138,7 +138,7 @@ export namespace PipelineFlow {
     return { id: pipelineId, stepLocators };
   }
 
-  export type RemoveOptions = {
+  type RemoveOptions = {
     id?: string;
   };
   export async function remove(page: Page, { id } = {} as RemoveOptions): Promise<void> {
@@ -219,7 +219,7 @@ export namespace PipelineFlow {
       return stepLocators;
     }
 
-    export async function drawRelationArrow(page: Page, stepLocators: StepLocators, { from, to }: { from: string; to: string }) {
+    export async function drawRelationArrow(stepLocators: StepLocators, { from, to }: { from: string; to: string }) {
       const DRAG_STEPS_TO_PREVENT_CLICK_INTERPRETATION = 30;
 
       const fromLocator = stepLocators.get(from);
@@ -233,7 +233,7 @@ export namespace PipelineFlow {
       });
     }
 
-    export async function cancelRelationArrow(page: Page, stepLocators: StepLocators, { to }: { to: string }) {
+    export async function cancelRelationArrow(stepLocators: StepLocators, { to }: { to: string }) {
       const toLocator = stepLocators.get(to);
       if (!toLocator) {
         throw new Error(`Cannot cancel arrow: step ${to} not found`);
@@ -241,7 +241,7 @@ export namespace PipelineFlow {
       await toLocator.getByTestId("input").click();
     }
 
-    export async function fillStepForm(page: Page, step: StepOptions): Promise<string> {
+    async function fillStepForm(page: Page, step: StepOptions): Promise<string> {
       await page.getByRole("button", { name: step.type, exact: true }).click();
       switch (step.type) {
         case "Compression": {

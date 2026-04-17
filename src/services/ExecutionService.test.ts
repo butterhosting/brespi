@@ -10,8 +10,8 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { ExecutionService } from "./ExecutionService";
 
 describe(ExecutionService.name, async () => {
-  let context!: TestEnvironment.Context;
-  let service!: ExecutionService;
+  let context: TestEnvironment.Context;
+  let service: ExecutionService;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

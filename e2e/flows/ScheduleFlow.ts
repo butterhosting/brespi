@@ -30,23 +30,8 @@ export namespace ScheduleFlow {
     await submitSave(page);
   }
 
-  type RemoveOptions = {
-    index: number;
-  };
-  export async function remove(page: Page, { index }: RemoveOptions) {
-    await page.getByRole("link", { name: "Schedules", exact: true }).click();
-    await page.getByTestId("schedule-row").nth(index).getByRole("button", { name: "Edit" }).click();
-    await submitDelete(page);
-  }
-
   async function submitSave(page: Page) {
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByRole("button", { name: "Save", exact: true })).not.toBeVisible();
-  }
-
-  async function submitDelete(page: Page) {
-    await page.getByRole("button", { name: "Delete", exact: true }).click();
-    await page.getByRole("button", { name: "Yes, delete", exact: true }).click(); // Pop-up
-    await expect(page.getByRole("button", { name: "Delete", exact: true })).not.toBeVisible();
   }
 }

@@ -196,7 +196,7 @@ export function schedulesPage() {
   );
 }
 
-export namespace Internal {
+namespace Internal {
   export type ScheduleVisualization = Schedule & {
     pipelineName: string;
   };

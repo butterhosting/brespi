@@ -29,7 +29,7 @@ export namespace ZodParser {
           }
         }
         parseFn.SCHEMA = schema;
-        // @ts-ignore
+        // @ts-expect-error
         return {
           ensureTypeMatchesSchema() {
             return parseFn;

@@ -4,16 +4,7 @@ import { MariadbBoundary } from "./boundaries/MariadbBoundary";
 import { PostgresqlBoundary } from "./boundaries/PostgresqlBoundary";
 import { ResetBoundary } from "./boundaries/ResetBoundary";
 import { PipelineFlow } from "./flows/PipelineFlow";
-
-type Row = Record<string, string | number | boolean | null>;
-
-type DatabaseBoundary = {
-  database: (opts: { operation: "create" | "drop"; database: string }) => Promise<void>;
-  setup: (opts: { database: string; tables: Array<{ name: string; initialRows: Row[] }> }) => Promise<void>;
-  queryAll: (opts: { database: string; table: string }) => Promise<Row[]>;
-  execute: (opts: { database: string; sql: string }) => Promise<Row[]>;
-  insert: (opts: { database: string; table: string; rows: Row[] }) => Promise<void>;
-};
+import { DatabaseBoundary } from "./boundaries/interface/DatabaseBoundary";
 
 type DatabaseConfig = {
   name: string;
@@ -31,7 +22,7 @@ enum Database {
 
 const createPostgresqlConfig = (): DatabaseConfig => ({
   name: "postgresql",
-  boundary: PostgresqlBoundary,
+  boundary: new PostgresqlBoundary(),
   connectionUrl: "${MY_POSTGRESQL_URL}",
   backupStepType: "PostgreSQL Backup",
   restoreStepType: "PostgreSQL Restore",
@@ -40,7 +31,7 @@ const createPostgresqlConfig = (): DatabaseConfig => ({
 
 const createMariadbConfig = (): DatabaseConfig => ({
   name: "mariadb",
-  boundary: MariadbBoundary,
+  boundary: new MariadbBoundary(),
   connectionUrl: "${MY_MARIADB_URL}",
   backupStepType: "MariaDB Backup",
   restoreStepType: "MariaDB Restore",

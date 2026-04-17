@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { EncryptionAdapter } from "./EncryptionAdapter";
 
 describe(EncryptionAdapter.name, async () => {
-  let context!: TestEnvironment.Context;
-  let adapter!: EncryptionAdapter;
+  let context: TestEnvironment.Context;
+  let adapter: EncryptionAdapter;
 
   const keyRef = "UNIT_TEST_KEY";
   beforeEach(async () => {

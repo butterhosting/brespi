@@ -1,7 +1,5 @@
 import { Step as S } from "@/models/Step";
 
-import grid from "./background/grid.svg";
-
 import close from "./icons/close.svg";
 import error from "./icons/error.svg";
 import newSvg from "./icons/new.svg";
@@ -28,10 +26,6 @@ import s3_download from "./steps/s3_download.PNG";
 import s3_upload from "./steps/s3_upload.PNG";
 
 export namespace Images {
-  export const Background = {
-    grid,
-  } as const;
-
   export const Icon = {
     close,
     error,

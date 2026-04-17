@@ -1,11 +1,11 @@
+import { Configuration } from "@/models/Configuration";
+import { ProblemDetails } from "@/models/ProblemDetails";
 import { ServerMessage } from "@/socket/ServerMessage";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ConfigurationClient } from "../clients/ConfigurationClient";
 import { SocketClient } from "../clients/SocketClient";
 import { useRegistry } from "./useRegistry";
 import { useYesQuery } from "./useYesQuery";
-import { ProblemDetails } from "@/models/ProblemDetails";
-import { Configuration } from "@/models/Configuration";
 
 type Result = {
   synchronized: boolean;

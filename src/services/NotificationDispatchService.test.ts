@@ -13,8 +13,8 @@ describe(NotificationDispatchService.name, async () => {
   const PIPELINE_ID = "my-pipeline-id";
   const PIPELINE_NAME = "superpipeline";
 
-  let context!: TestEnvironment.Context;
-  let service!: NotificationDispatchService;
+  let context: TestEnvironment.Context;
+  let service: NotificationDispatchService;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

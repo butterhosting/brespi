@@ -11,7 +11,7 @@ import { RegressionSuite } from "./RegressionSuite";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 
 describe("regression", () => {
-  let database!: Sqlite;
+  let database: Sqlite;
 
   beforeEach(async () => {
     database?.close();

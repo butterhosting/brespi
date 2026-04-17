@@ -2,6 +2,7 @@ import { FilesystemAdapter } from "@/adapters/filesystem/FilesystemAdapter";
 import { FilterCapability } from "@/capabilities/filter/FilterCapability";
 import { ManagedStorageCapability } from "@/capabilities/managedstorage/ManagedStorageCapability";
 import { Version } from "@/capabilities/managedstorage/Version";
+import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 import * as schema from "@/drizzle/schema";
 import { $action, $execution, $notificationPolicyMetadata, $scheduleMetadata } from "@/drizzle/schema";
 import { Sqlite } from "@/drizzle/sqlite";
@@ -15,11 +16,10 @@ import { ExecutionConverter } from "@/repositories/converters/ExecutionConverter
 import { NotificationPolicyMetadataConverter } from "@/repositories/converters/NotificationPolicyMetadataConverter";
 import { ScheduleMetadataConverter } from "@/repositories/converters/ScheduleMetadataConverter";
 import { spyOn, test } from "bun:test";
-import { getTableName, InferInsertModel } from "drizzle-orm";
+import { InferInsertModel } from "drizzle-orm";
 import { cp, mkdir } from "fs/promises";
 import { basename, dirname, join } from "path";
 import { TestFixture } from "../TestFixture.test";
-import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 
 test.skip("regression suite management", async () => {
   const { rm } = await import("fs/promises");
@@ -61,6 +61,7 @@ test.skip("regression suite management", async () => {
   await rm(RegressionSuite.Path.suiteTmp, { recursive: true, force: true });
 });
 
+// @ts-ignore (unused variable which is never read)
 const Example = {
   async configuration() {
     await RegressionSuite.Configuration.writeJson("configuration_99.json", {

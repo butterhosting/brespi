@@ -97,7 +97,7 @@ test("relation links can be created when a step form is open", async ({ page }) 
   await unlinkedStepLocators.get("A")!.click();
   await expect(page.getByRole("button", { name: "Update step" })).toBeVisible();
   // when (drawing an arrow)
-  await PipelineFlow.Subroutine.drawRelationArrow(page, unlinkedStepLocators, {
+  await PipelineFlow.Subroutine.drawRelationArrow(unlinkedStepLocators, {
     from: "A",
     to: "B",
   });
@@ -131,7 +131,7 @@ test("relation links can be deleted when a step form is open", async ({ page }) 
   await stepLocators.get("A")!.click();
   await expect(page.getByRole("button", { name: "Update step" })).toBeVisible();
   // when (removing the arrow relation)
-  await PipelineFlow.Subroutine.cancelRelationArrow(page, stepLocators, { to: "B" });
+  await PipelineFlow.Subroutine.cancelRelationArrow(stepLocators, { to: "B" });
   await page.getByRole("button", { name: "Cancel" }).last().click();
 
   // then (an error when saving, because the steps aren't linked anymore)

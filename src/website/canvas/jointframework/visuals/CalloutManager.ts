@@ -1,9 +1,10 @@
+import { RequireNoNulls } from "@/types/RequireNoNulls";
 import { dia } from "@joint/core";
-import { Block } from "../../Block";
 import { Color } from "../../../Color";
+import { Block } from "../../Block";
 import { Sizing } from "../constants/Sizing";
 
-export type CalloutData = Pick<
+type CalloutData = Pick<
   RequireNoNulls<
     Block & {
       details: Block.Details;
@@ -44,7 +45,6 @@ export class CalloutManager {
   })();
 
   private layer: SVGGElement;
-  private currentCell: dia.Element | null = null;
   private positionListener: (() => void) | null = null;
 
   constructor(paper: dia.Paper) {
@@ -63,7 +63,6 @@ export class CalloutManager {
     cell.toFront();
 
     const element = cell as dia.Element;
-    this.currentCell = element;
     this.layer.innerHTML = "";
 
     const group = this.renderCallout(data, Sizing.CALLOUT_WIDTH);
@@ -86,7 +85,6 @@ export class CalloutManager {
 
   public hideDetails(): void {
     this.clearPositionListener();
-    this.currentCell = null;
 
     this.layer.style.display = "none";
     this.layer.innerHTML = "";
@@ -94,7 +92,6 @@ export class CalloutManager {
 
   public cleanup(): void {
     this.clearPositionListener();
-    this.currentCell = null;
     this.layer.remove();
   }
 

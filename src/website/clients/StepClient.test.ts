@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { StepClient } from "./StepClient";
 
 describe(StepClient.name, () => {
-  let context!: TestEnvironment.Context;
-  let client!: StepClient;
+  let context: TestEnvironment.Context;
+  let client: StepClient;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

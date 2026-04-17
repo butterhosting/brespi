@@ -8,8 +8,8 @@ import { Manifest } from "./Manifest";
 import { Version } from "./Version";
 
 describe(ManagedStorageCapability.name, async () => {
-  let context!: TestEnvironment.Context;
-  let capability!: ManagedStorageCapability;
+  let context: TestEnvironment.Context;
+  let capability: ManagedStorageCapability;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

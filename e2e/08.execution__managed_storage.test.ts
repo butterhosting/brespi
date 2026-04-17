@@ -223,8 +223,8 @@ async function performRetentionTest({ page, listStorageEntries, pipelineStep }: 
   // when (prepare files to upload)
   for (let iteration = 1; iteration <= numberOfVersionsToTryAndStore; iteration++) {
     await Common.emptyDirectory(inputDir);
-    const furniture = (i: number) => [`Armchair-${iteration}.txt`, `Bench-${iteration}.txt`, `Cabinet-${iteration}.txt`];
-    await writeTestFiles(inputDir, furniture(iteration));
+    const furniture = () => [`Armchair-${iteration}.txt`, `Bench-${iteration}.txt`, `Cabinet-${iteration}.txt`];
+    await writeTestFiles(inputDir, furniture());
     // when (run the pipeline)
     await PipelineFlow.execute(page);
     await page.getByRole("button", { name: "Close execution view" }).click();
@@ -234,7 +234,7 @@ async function performRetentionTest({ page, listStorageEntries, pipelineStep }: 
     // variable above: [1] -> [1,2] -> [1,2,3] -> [2,3,4] -> [3,4,5]
     await verifyStorage({
       entries: await listStorageEntries(),
-      expectedFilenames: expectedVersionIterations.flatMap((iteration) => furniture(iteration)),
+      expectedFilenames: expectedVersionIterations.flatMap(() => furniture()),
       expectedListingCount: expectedVersionIterations.length,
     });
   }

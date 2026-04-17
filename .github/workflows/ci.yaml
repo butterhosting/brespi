@@ -33,6 +33,9 @@ jobs:
       - name: "Application :: Type Checking"
         run: bun tc
 
+      - name: "Application :: Linting"
+        run: bun lint
+
       - name: "Application :: Unit Tests"
         run: bun test:unit
 

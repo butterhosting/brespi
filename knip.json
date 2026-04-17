@@ -1,0 +1,6 @@
+{
+  "entry": ["src/website/index.tsx"],
+  "project": ["src/**/*.{ts,tsx}", "e2e/**/*.ts"],
+  "ignoreDependencies": ["bun-plugin-tailwind", "tailwindcss"],
+  "ignoreBinaries": ["deployment/test.sh"]
+}

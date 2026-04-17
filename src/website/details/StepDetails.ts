@@ -1,7 +1,5 @@
-import { Prettify } from "@/helpers/Prettify";
-import { Action } from "@/models/Action";
-import { Outcome } from "@/models/Outcome";
 import { Step } from "@/models/Step";
+import { ValueOf } from "@/types/ValueOf";
 import { Block } from "../canvas/Block";
 import { CompressionForm } from "../forms/step/CompressionForm";
 import { CustomScriptForm } from "../forms/step/CustomScriptForm";

@@ -1,49 +1,16 @@
 import * as mariadb from "mariadb";
+import { DatabaseBoundary } from "./interface/DatabaseBoundary";
 
-export namespace MariadbBoundary {
-  export type Row = Record<string, string | number | boolean | null>;
-
-  type DatabaseOptions = {
-    operation: "create" | "drop";
-    database: string;
-  };
-  export async function database({ operation, database }: DatabaseOptions): Promise<void> {
+export class MariadbBoundary implements DatabaseBoundary {
+  public async database({ operation, database }: DatabaseBoundary.DatabaseOptions): Promise<void> {
     if (operation === "create") {
-      await execute({ database: "", sql: `CREATE DATABASE ${database}` });
+      await this.execute({ database: "", sql: `CREATE DATABASE ${database}` });
     } else {
-      await execute({ database: "", sql: `DROP DATABASE IF EXISTS ${database}` });
+      await this.execute({ database: "", sql: `DROP DATABASE IF EXISTS ${database}` });
     }
   }
 
-  type TableOptions = {
-    database: string;
-    table: string;
-  } & (
-    | {
-        operation: "create";
-        tableDefinition: Record<string, string>;
-      }
-    | {
-        operation: "drop";
-      }
-  );
-  export async function table({ database, table, ...opts }: TableOptions): Promise<void> {
-    if (opts.operation === "create") {
-      const columns = Object.entries(opts.tableDefinition)
-        .map(([name, type]) => `${name} ${type}`)
-        .join(", ");
-      await execute({ database, sql: `CREATE TABLE ${table} (${columns})` });
-    } else {
-      await execute({ database, sql: `DROP TABLE IF EXISTS ${table}` });
-    }
-  }
-
-  type InsertOptions = {
-    database: string;
-    table: string;
-    rows: Row[];
-  };
-  export async function insert({ database, table, rows }: InsertOptions): Promise<void> {
+  public async insert({ database, table, rows }: DatabaseBoundary.InsertOptions): Promise<void> {
     if (rows.length === 0) return;
     const columns = Object.keys(rows[0]);
     const values = rows
@@ -59,22 +26,15 @@ export namespace MariadbBoundary {
             .join(", ")})`,
       )
       .join(", ");
-    await execute({
+    await this.execute({
       database,
       sql: `INSERT INTO ${table} (${columns.join(", ")}) VALUES ${values}`,
     });
   }
 
-  type SetupOptions = {
-    database: string;
-    tables: Array<{
-      name: string;
-      initialRows: Row[];
-    }>;
-  };
-  export async function setup({ database, tables }: SetupOptions): Promise<void> {
-    await MariadbBoundary.database({ operation: "drop", database });
-    await MariadbBoundary.database({ operation: "create", database });
+  public async setup({ database, tables }: DatabaseBoundary.SetupOptions): Promise<void> {
+    await this.database({ operation: "drop", database });
+    await this.database({ operation: "create", database });
     for (const { name: table, initialRows: rows } of tables) {
       if (rows.length === 0) {
         throw new Error(`Table ${table} must have at least one row to infer schema`);
@@ -85,14 +45,48 @@ export namespace MariadbBoundary {
         if (value === null) {
           throw new Error(`First row cannot have null values (found null in column ${key})`);
         }
-        tableDefinition[key] = inferColumnType(key, value);
+        tableDefinition[key] = this.inferColumnType(key, value);
       }
-      await MariadbBoundary.table({ operation: "create", database, table, tableDefinition });
-      await MariadbBoundary.insert({ database, table, rows });
+      await this.table({ operation: "create", database, table, tableDefinition });
+      await this.insert({ database, table, rows });
     }
   }
 
-  function inferColumnType(key: string, value: string | number | boolean): string {
+  public async queryAll({ database, table }: DatabaseBoundary.QueryOptions): Promise<DatabaseBoundary.Row[]> {
+    return await this.execute({ database, sql: `SELECT * FROM ${table}` });
+  }
+
+  public async execute({ database, sql: sqlToExecute }: DatabaseBoundary.ExecuteOptions): Promise<DatabaseBoundary.Row[]> {
+    const conn = await mariadb.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "root",
+      database: database || undefined,
+    });
+    try {
+      const result = await conn.query(sqlToExecute);
+      // MariaDB returns an array with metadata at the end for some queries
+      if (Array.isArray(result)) {
+        return result.filter((row) => typeof row === "object" && row !== null && !("affectedRows" in row)) as DatabaseBoundary.Row[];
+      }
+      return [];
+    } finally {
+      await conn.end();
+    }
+  }
+
+  private async table({ database, table, ...opts }: DatabaseBoundary.TableOptions): Promise<void> {
+    if (opts.operation === "create") {
+      const columns = Object.entries(opts.tableDefinition)
+        .map(([name, type]) => `${name} ${type}`)
+        .join(", ");
+      await this.execute({ database, sql: `CREATE TABLE ${table} (${columns})` });
+    } else {
+      await this.execute({ database, sql: `DROP TABLE IF EXISTS ${table}` });
+    }
+  }
+
+  private inferColumnType(key: string, value: string | number | boolean): string {
     if (key === "id" && typeof value === "number") {
       return "INT AUTO_INCREMENT PRIMARY KEY";
     }
@@ -106,36 +100,5 @@ export namespace MariadbBoundary {
       return "BOOLEAN";
     }
     throw new Error(`Cannot infer type for column ${key} with value ${value}`);
-  }
-
-  type QueryOptions = {
-    database: string;
-    table: string;
-  };
-  export async function queryAll({ database, table }: QueryOptions): Promise<Row[]> {
-    return await execute({ database, sql: `SELECT * FROM ${table}` });
-  }
-
-  type ExecuteOptions = {
-    database: string;
-    sql: string;
-  };
-  export async function execute({ database, sql: sqlToExecute }: ExecuteOptions): Promise<Row[]> {
-    const conn = await mariadb.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "root",
-      database: database || undefined,
-    });
-    try {
-      const result = await conn.query(sqlToExecute);
-      // MariaDB returns an array with metadata at the end for some queries
-      if (Array.isArray(result)) {
-        return result.filter((row) => typeof row === "object" && row !== null && !("affectedRows" in row)) as Row[];
-      }
-      return [];
-    } finally {
-      await conn.end();
-    }
   }
 }

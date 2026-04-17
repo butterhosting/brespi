@@ -180,9 +180,6 @@ export class Server {
             const execution: Execution = await this.executionService.find(request.params.id);
             return Response.json(execution);
           }),
-          POST: this.handleRoute(async (request) => {
-            return Response.json(null);
-          }),
         },
 
         /**

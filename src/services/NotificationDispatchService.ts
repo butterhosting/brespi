@@ -1,5 +1,4 @@
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
-import { NotificationError } from "@/errors/NotificationError";
 import { Event } from "@/events/Event";
 import { CommandRunner } from "@/helpers/CommandRunner";
 import { Logger } from "@/Logger";

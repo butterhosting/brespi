@@ -9,8 +9,8 @@ import { join } from "path";
 import { FilesystemAdapter } from "./FilesystemAdapter";
 
 describe(FilesystemAdapter.name, async () => {
-  let context!: TestEnvironment.Context;
-  let adapter!: FilesystemAdapter;
+  let context: TestEnvironment.Context;
+  let adapter: FilesystemAdapter;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { S3Adapter } from "./S3Adapter";
 
 describe(S3Adapter.name, async () => {
-  let context!: TestEnvironment.Context;
-  let adapter!: S3Adapter;
+  let context: TestEnvironment.Context;
+  let adapter: S3Adapter;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

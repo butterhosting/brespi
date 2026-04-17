@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import { CompressionAdapter } from "./CompressionAdapter";
 
 describe(CompressionAdapter.name, async () => {
-  let context!: TestEnvironment.Context;
-  let adapter!: CompressionAdapter;
+  let context: TestEnvironment.Context;
+  let adapter: CompressionAdapter;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

@@ -46,7 +46,7 @@ export namespace Sizing {
   export const SPINNER_SIZE = 20;
   export const SPINNER_STROKE_WIDTH = 2;
   export const SPINNER_RADIUS = (SPINNER_SIZE - SPINNER_STROKE_WIDTH) / 2;
-  export const SPINNER_CIRCUMFERENCE = 2 * Math.PI * SPINNER_RADIUS;
+  const SPINNER_CIRCUMFERENCE = 2 * Math.PI * SPINNER_RADIUS;
   export const SPINNER_DASH_ARRAY = `${SPINNER_CIRCUMFERENCE * 0.75} ${SPINNER_CIRCUMFERENCE * 0.25}`;
 
   /**

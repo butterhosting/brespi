@@ -6,8 +6,8 @@ import { join } from "path";
 import { ScriptAdapter } from "./ScriptAdapter";
 
 describe(ScriptAdapter.name, async () => {
-  let context!: TestEnvironment.Context;
-  let adapter!: ScriptAdapter;
+  let context: TestEnvironment.Context;
+  let adapter: ScriptAdapter;
 
   beforeEach(async () => {
     context = await TestEnvironment.initialize();

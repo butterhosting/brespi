@@ -100,7 +100,7 @@ export function pipelines$idPage() {
    * Forms
    */
   const mainForm = useForm<Form>();
-  const [stepForm, stepFormRef, setStepForm] = useStateRef<{ id: string; type: Step.Type; existingStep?: Step }>();
+  const [stepForm, _stepFormRef, setStepForm] = useStateRef<{ id: string; type: Step.Type; existingStep?: Step }>();
 
   /**
    * General reset function (invoked initially, or after saving)

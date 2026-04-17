@@ -106,12 +106,16 @@ run_scenario() {
 # ─── verification functions ───
 
 verify_no_auth() {
-    assert_status "200" http://localhost:3000/api/env
+    assert_status "200" http://localhost:3000/api/env \
+    && assert_status "404" http://localhost:3000/api/restricted/seed -X POST \
+    && assert_status "404" http://localhost:3000/api/restricted/purge -X POST
 }
 
 verify_auth() {
     assert_status "401" http://localhost:3000/api/env \
-        && assert_status "200" -u kim:possible http://localhost:3000/api/env
+    && assert_status "200" http://localhost:3000/api/env -u kim:possible \
+    && assert_status "404" http://localhost:3000/api/restricted/seed -u kim:possible -X POST \
+    && assert_status "404" http://localhost:3000/api/restricted/purge -u kim:possible -X POST
 }
 
 # ─── scenarios ───

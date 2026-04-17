@@ -24,32 +24,6 @@ export namespace NotificationFlow {
     await submitSave(page);
   }
 
-  type UpdateOptions = {
-    index: number;
-    active?: boolean;
-    channel?: "Custom script";
-    customScriptPath?: string;
-    events?: {
-      execution_started?: boolean;
-      execution_completed?: boolean;
-    };
-  };
-  export async function updateSchedule(page: Page, { index, active, channel, customScriptPath, events }: UpdateOptions) {
-    await page.getByRole("link", { name: "Notifications", exact: true }).click();
-    await page.getByTestId("policy-row").nth(index).getByRole("button", { name: "Edit" }).click();
-    if (active !== undefined) await page.getByLabel("Active").setChecked(active, { force: true }); // Force, because it's hidden (opaque)
-    if (channel !== undefined) await page.getByLabel("Channel").selectOption(channel);
-    if (channel === "Custom script") {
-      if (customScriptPath !== undefined) await page.getByLabel("path for the custom script").fill(customScriptPath);
-    }
-    if (events !== undefined) {
-      for (const [key, enabled] of Object.entries(events)) {
-        await page.getByLabel(key).setChecked(enabled);
-      }
-    }
-    await submitSave(page);
-  }
-
   type RemoveOptions = {
     index: number;
   };

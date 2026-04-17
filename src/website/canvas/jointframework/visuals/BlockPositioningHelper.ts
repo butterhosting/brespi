@@ -5,7 +5,7 @@ import { JointBlock } from "../models/JointBlock";
 import { Sizing } from "../constants/Sizing";
 
 export namespace PositioningHelper {
-  export function performSmartPositioning(blocks: Block[], paperDimensions: Dimensions): JointBlock[] {
+  export function performSmartPositioning(blocks: Block[], _paperDimensions: Dimensions): JointBlock[] {
     const childrenMap = new Map<string | undefined, Block[]>();
     blocks.forEach((block) => {
       const parent = block.incomingId;
