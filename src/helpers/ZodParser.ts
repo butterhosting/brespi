@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import z, { ZodError } from "zod/v4";
 
 type MustMatch<X, Y> = [X] extends [Y] ? ([Y] extends [X] ? X : never) : never;
@@ -13,6 +14,15 @@ type ParserFactory<T, U> =
       };
 
 export namespace ZodParser {
+  export function instant(value: string, ctx: z.RefinementCtx): Temporal.Instant {
+    try {
+      return Temporal.Instant.from(value);
+    } catch {
+      ctx.addIssue({ code: "custom", message: "invalid instant" });
+      return z.NEVER;
+    }
+  }
+
   export function forType<T>() {
     return {
       ensureSchemaMatchesType<U extends z.ZodType<T>>(schemaFn: () => U): ParserFactory<T, z.output<U>> {

@@ -24,13 +24,13 @@ export namespace Execution {
         id: z.string(),
         object: z.literal("execution"),
         pipelineId: z.string(),
-        startedAt: z.string().transform((x) => Temporal.Instant.from(x)),
+        startedAt: z.string().transform(ZodParser.instant),
         actions: z.array(Action.parse.SCHEMA),
         result: z
           .object({
             duration: z.string().transform(Temporal.Duration.from),
             outcome: z.enum(Outcome),
-            completedAt: z.string().transform((x) => Temporal.Instant.from(x)),
+            completedAt: z.string().transform(ZodParser.instant),
           })
           .optional(),
       }),

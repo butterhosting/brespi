@@ -38,15 +38,12 @@ export namespace Action {
         stepId: z.string(),
         stepType: z.string(),
         previousStepId: z.string().optional(),
-        startedAt: z
-          .string()
-          .transform((x) => Temporal.Instant.from(x))
-          .optional(),
+        startedAt: z.string().transform(ZodParser.instant).optional(),
         result: z
           .object({
             outcome: z.enum(Outcome),
             duration: z.string().transform(Temporal.Duration.from),
-            completedAt: z.string().transform((x) => Temporal.Instant.from(x)),
+            completedAt: z.string().transform(ZodParser.instant),
             consumed: z.array(artifactSummarySchema),
             produced: z.array(artifactSummarySchema),
             errorMessage: z.string().optional(),
