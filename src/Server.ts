@@ -285,7 +285,7 @@ export class Server {
             ]
           : [
               `  \x1b[1mMode\x1b[0m      Running normally`, //
-              `            https://butterhost.ing/brespi/with-love`, //
+              `            https://butterhost.ing/brespi/love`, //
             ]),
         "",
       ].join("\n"),
