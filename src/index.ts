@@ -1,22 +1,22 @@
 import { mkdir } from "fs/promises";
 import { Sqlite } from "./drizzle/sqlite";
 import { Env } from "./Env";
+import { Logger } from "./Logger";
 import { BasicAuthMiddleware } from "./middleware/basicauth/BasicAuthMiddleware";
 import { ConfigurationRepository } from "./repositories/ConfigurationRepository";
 import { Server } from "./Server";
 import { ServerRegistry } from "./ServerRegistry";
 import { CleanupService } from "./services/CleanupService";
-import { Logger } from "./Logger";
+
+/**
+ * Initialize the logger
+ */
+Logger.initialize(Env.initializePartiallyForLogger());
 
 /**
  * Initialize the env configuration
  */
 const env = Env.initialize();
-
-/**
- * Initialize the logger
- */
-Logger.initialize(env);
 
 /**
  * Create the main directories

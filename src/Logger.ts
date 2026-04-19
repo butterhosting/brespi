@@ -13,7 +13,7 @@ export class Logger {
     [LogLevel.error]: "❌",
   };
 
-  public static initialize(env: Env.Private) {
+  public static initialize(env: Pick<Env.Private, "O_BRESPI_TIMEZONE" | "X_BRESPI_LOGGING">) {
     this.timeZone = env.O_BRESPI_TIMEZONE;
     this.globalLogLevel = env.X_BRESPI_LOGGING;
   }
