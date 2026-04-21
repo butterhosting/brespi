@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="428px" height="326px" viewBox="0 0 428 326" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group Copy</title>
+    <g id="Brespi-Interface" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-Copy" transform="translate(0, 0.525)">
+            <g id="Group" transform="translate(189.2918, 138.0184)">
+                <polygon id="Rectangle" fill="#828080" points="25.2082323 38.7597305 135.708232 69.2467156 134.583118 165.083617 0 119.175563"></polygon>
+                <polygon id="Rectangle-2" fill="#B1AAAA" points="135.708232 69.2467156 238.351993 35.8736184 235.090446 124.63404 134.708232 165.456584"></polygon>
+                <polygon id="Rectangle-3" fill="#2323F2" points="25.2082323 38.7597305 88.5271302 0 238.351993 35.8736184 135.708232 69.2467156"></polygon>
+            </g>
+            <g id="Group" transform="translate(0, 0.0113)">
+                <polygon id="Rectangle" fill="#8585F6" points="199.40281 2.26759531e-13 316.344527 19.0497183 112.554831 257.182663 0 212.463683"></polygon>
+                <polygon id="Rectangle-2" fill="#B1AAAA" points="0 212.463683 112.554831 257.182663 158.172264 324.688744 50.3321387 278.376407"></polygon>
+                <polygon id="Rectangle-3" fill="#D8D8D8" points="112.554831 257.182663 316.344527 19.0497183 348.614433 92.1627731 158 324.463683"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

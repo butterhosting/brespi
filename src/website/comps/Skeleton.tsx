@@ -72,8 +72,8 @@ namespace Internal {
     const seed = () => restrictedClient.seed().then(() => location.reload());
     return (
       <footer className="u-root-grid-minus-gutters my-12 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2">
-          <BrespiLogo className="size-12" withLove={O_BRESPI_SUPPORTER} />
+        <div className="flex items-center gap-3">
+          <BrespiLogo className="h-10 w-auto" withLove={O_BRESPI_SUPPORTER} />
           <div className="text-4xl font-extrabold italic text-c-dark pr-5">Brespi</div>
         </div>
         <div className="italic text-c-dark -mt-3 pl-5">
