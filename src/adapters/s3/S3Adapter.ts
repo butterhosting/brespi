@@ -4,7 +4,10 @@ import { Env } from "@/Env";
 import { Artifact } from "@/models/Artifact";
 import { Step } from "@/models/Step";
 import { StepWithRuntime } from "@/models/StepWithRuntime";
+import { createWriteStream } from "fs";
+import { unlink } from "fs/promises";
 import { isAbsolute, join, relative } from "path";
+import { pipeline } from "stream/promises";
 import { AbstractAdapter } from "../AbstractAdapter";
 import { AdapterResult } from "../AdapterResult";
 import { BrespiS3Client } from "./BrespiS3Client";
@@ -91,7 +94,13 @@ export class S3Adapter extends AbstractAdapter {
     const artifacts: Artifact[] = [];
     for (const { name, path } of selectableArtifacts) {
       const { outputId, outputPath } = this.generateArtifactDestination();
-      await Bun.write(outputPath, await client.file(path).arrayBuffer());
+      try {
+        const source = await client.file(path).stream();
+        await pipeline(source, createWriteStream(outputPath));
+      } catch (cause) {
+        await unlink(outputPath).catch(() => {});
+        throw cause;
+      }
       artifacts.push({
         id: outputId,
         type: "file",

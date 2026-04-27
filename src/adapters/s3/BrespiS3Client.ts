@@ -6,6 +6,7 @@ import {
   HeadObjectCommand,
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
+import { Readable } from "stream";
 
 export class BrespiS3Client {
   private readonly awsClient: AWSS3Client;
@@ -167,6 +168,16 @@ export namespace BrespiS3Client {
       );
       const bytes = await result.Body!.transformToByteArray();
       return bytes.buffer as ArrayBuffer;
+    }
+
+    async stream(): Promise<Readable> {
+      const result = await this.awsClient.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: this.key,
+        }),
+      );
+      return result.Body as Readable;
     }
   }
 }
