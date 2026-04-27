@@ -128,6 +128,7 @@ export namespace Step {
 
   export type FolderFlatten = Common & {
     type: Type.folder_flatten;
+    level: number;
   };
 
   export type FolderGroup = Common & {
@@ -339,6 +340,7 @@ export namespace Step {
         z.object({
           ...subSchema.common,
           type: z.literal(Type.folder_flatten),
+          level: z.int().min(-1),
         } satisfies SubSchema<Step.FolderFlatten>),
 
         z.object({

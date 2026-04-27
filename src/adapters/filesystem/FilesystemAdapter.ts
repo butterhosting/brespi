@@ -128,18 +128,19 @@ export class FilesystemAdapter extends AbstractAdapter {
     }
   }
 
-  public async folderFlatten(artifacts: Artifact[], _step: Step.FolderFlatten): Promise<AdapterResult> {
-    this.log.debug(`Preparing to flatten artifacts; artifacts.length=${artifacts.length}`);
+  public async folderFlatten(artifacts: Artifact[], step: Step.FolderFlatten): Promise<AdapterResult> {
+    const { level } = step;
+    this.log.debug(`Preparing to flatten artifacts; artifacts.length=${artifacts.length}, level=${level}`);
     const result: Artifact[] = [];
     for (const artifact of artifacts) {
-      if (artifact.type === "file") {
+      if (artifact.type === "file" || level === 0) {
         result.push(artifact); // Re-use is okay; cleanup won't clean output artifacts
       } else {
-        result.push(...(await this.readDirectoryRecursively(artifact.path)));
+        result.push(...(await this.readDirectoryRecursively(artifact.path, level)));
       }
     }
 
-    this.log.info(`Successfully flattened artifacts; input.length=${artifacts.length}, output.length=${result.length}`);
+    this.log.info(`Successfully flattened artifacts; input.length=${artifacts.length}, output.length=${result.length}, level=${level}`);
     return AdapterResult.create(result);
   }
 
@@ -177,7 +178,7 @@ export class FilesystemAdapter extends AbstractAdapter {
     };
   }
 
-  private async readDirectoryRecursively(dirPath: string): Promise<Artifact[]> {
+  private async readDirectoryRecursively(dirPath: string, depthToDescend: number): Promise<Artifact[]> {
     const artifacts: Artifact[] = [];
     const entries = await readdir(dirPath, { withFileTypes: true });
     for (const entry of entries) {
@@ -192,8 +193,20 @@ export class FilesystemAdapter extends AbstractAdapter {
           name: entry.name,
         });
       } else if (entry.isDirectory()) {
-        const subArtifacts = await this.readDirectoryRecursively(fullPath);
-        artifacts.push(...subArtifacts);
+        if (depthToDescend === 1) {
+          const { outputId, outputPath } = this.generateArtifactDestination();
+          await rename(fullPath, outputPath);
+          artifacts.push({
+            id: outputId,
+            type: "directory",
+            path: outputPath,
+            name: entry.name,
+          });
+        } else {
+          const nextDepth = depthToDescend === -1 ? -1 : depthToDescend - 1;
+          const subArtifacts = await this.readDirectoryRecursively(fullPath, nextDepth);
+          artifacts.push(...subArtifacts);
+        }
       }
     }
     return artifacts;

@@ -143,18 +143,21 @@ export class S3Adapter extends AbstractAdapter {
     return {
       writeFn: async (item: { path: string; content: string }) => {
         await client.write(item.path, item.content).catch((cause) => {
-          throw new Error(`Failed to write S3 file; path=${item.path}`, { cause });
+          this.log.error(cause);
+          throw new Error(`Failed to write S3 file; path=${item.path}`);
         });
       },
       readFn: async (path: string) => {
         const file = client.file(path);
         try {
           const exists = await file.exists().catch((cause) => {
-            throw new Error(`Failed to check S3 file existence; path=${path}`, { cause });
+            this.log.error(cause);
+            throw new Error(`Failed to check S3 file existence; path=${path}`);
           });
           if (exists) {
             return await file.text().catch((cause) => {
-              throw new Error(`Failed to read S3 file content; path=${path}`, { cause });
+              this.log.error(cause);
+              throw new Error(`Failed to read S3 file content; path=${path}`);
             });
           }
           return undefined;

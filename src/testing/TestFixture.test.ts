@@ -151,6 +151,7 @@ export namespace TestFixture {
       case Step.Type.folder_flatten: {
         const step: Step.FolderFlatten = {
           type: Step.Type.folder_flatten,
+          level: -1,
           ...common,
         };
         return step as Extract<Step, { type: T }>;

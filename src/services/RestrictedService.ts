@@ -83,6 +83,7 @@ export class RestrictedService {
               endpoint: "http://s3:9000",
               accessKey: "${MY_S3_ACCESS_KEY}",
               secretKey: "${MY_S3_SECRET_KEY}",
+              region: "eu-central-1",
             },
           },
           basePrefix: "postgresql-backups",
@@ -170,6 +171,7 @@ export class RestrictedService {
               endpoint: "http://s3:9000",
               accessKey: "${MY_S3_ACCESS_KEY}",
               secretKey: "${MY_S3_SECRET_KEY}",
+              region: "eu-central-1",
             },
           },
           basePrefix: "postgresql-backups",
@@ -497,6 +499,7 @@ export class RestrictedService {
           previousId: "ywcsyqlawrlw",
           object: "step",
           type: Step.Type.folder_flatten,
+          level: -1,
         },
         {
           id: "ywcsyqlawrlw",

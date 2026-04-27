@@ -58,7 +58,9 @@ export namespace StepDetails {
       }
       case Step.Type.folder_flatten: {
         const F = FolderFlattenForm.Field;
-        return performLabeling<typeof F>(FolderFlattenForm.Label, {});
+        return performLabeling<typeof F>(FolderFlattenForm.Label, {
+          [F.level]: step.level,
+        });
       }
       case Step.Type.folder_group: {
         const F = FolderGroupForm.Field;
