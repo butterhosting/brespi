@@ -41,5 +41,5 @@ const registry = await ServerRegistry.bootstrap(env, sqlite);
  */
 await registry.get(ConfigurationRepository).initializeFromDisk();
 await registry.get(BasicAuthMiddleware).initializeFromDisk();
-registry.get(CleanupService).keepTmpFolderClean();
+await registry.get(CleanupService).initializeCleanup();
 registry.get(Server).listen();

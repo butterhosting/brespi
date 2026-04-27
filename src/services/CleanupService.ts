@@ -1,18 +1,21 @@
+import { $execution } from "@/drizzle/schema";
+import { Sqlite } from "@/drizzle/sqlite";
 import { Env } from "@/Env";
 import { Temporal } from "@js-temporal/polyfill";
+import { isNull } from "drizzle-orm";
 import { readdir, rm } from "fs/promises";
 import { join } from "path";
 
 export class CleanupService {
-  public constructor(private readonly env: Env.Private) {}
+  public constructor(
+    private readonly env: Env.Private,
+    private readonly sqlite: Sqlite,
+  ) {}
 
-  public keepTmpFolderClean() {
-    setInterval(() => this.clean(), 60_000);
-    this.clean();
-  }
-
-  private clean() {
-    this.cleanTmpFolder();
+  public async initializeCleanup() {
+    await this.cleanPendingExecutions(); // only do this once during startup (cannot have pending executions)
+    await this.cleanTmpFolder();
+    setInterval(() => this.cleanTmpFolder(), 60_000);
   }
 
   private async cleanTmpFolder() {
@@ -38,5 +41,9 @@ export class CleanupService {
         await rm(join(tmpRoot, entry), { recursive: true, force: true });
       }
     }
+  }
+
+  private async cleanPendingExecutions() {
+    await this.sqlite.delete($execution).where(isNull($execution.resultCompletedAt));
   }
 }

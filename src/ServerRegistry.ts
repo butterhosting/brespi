@@ -19,6 +19,7 @@ import { LoggingMiddleware } from "./middleware/logging/LoggingMiddleware";
 import { Middleware } from "./middleware/Middleware";
 import { ConfigurationRepository } from "./repositories/ConfigurationRepository";
 import { ExecutionRepository } from "./repositories/ExecutionRepository";
+import { MigrationManager } from "./repositories/migrators/MigrationManager";
 import { NotificationRepository } from "./repositories/NotificationRepository";
 import { PipelineRepository } from "./repositories/PipelineRepository";
 import { ScheduleRepository } from "./repositories/ScheduleRepository";
@@ -32,7 +33,6 @@ import { PipelineService } from "./services/PipelineService";
 import { RestrictedService } from "./services/RestrictedService";
 import { ScheduleService } from "./services/ScheduleService";
 import { StepService } from "./services/StepService";
-import { MigrationManager } from "./repositories/migrators/MigrationManager";
 
 export class ServerRegistry {
   public static async bootstrap(env: Env.Private, sqlite: Sqlite): Promise<ServerRegistry> {
@@ -109,7 +109,7 @@ export class ServerRegistry {
       notificationService,
       configurationService,
     ]);
-    this.register({ CleanupService }, [env]);
+    this.register({ CleanupService }, [env, sqlite]);
 
     // Middleware
     const { loggingMiddleware } = this.register({ LoggingMiddleware }, []);
