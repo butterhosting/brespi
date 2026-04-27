@@ -62,7 +62,10 @@ export class ConfigurationRepository {
       const input = this.getCurrentValue();
       const output = await fn(input);
       const memoryObject = Configuration.Core.parse(output.configuration);
-      const memoryObjectMatchesDiskFile = await this.compareMemoryObjectWithDiskFile(memoryObject);
+      const memoryObjectMatchesDiskFile: boolean = await (async () => {
+        const diskValue = (await this.readAndMigrateDiskConfiguration()).memoryObject; // sic
+        return Bun.deepEquals(memoryObject, diskValue);
+      })();
       this.performUpdate({
         trigger: "application",
         memoryObject,
@@ -94,22 +97,16 @@ export class ConfigurationRepository {
     };
   }
 
-  private async compareMemoryObjectWithDiskFile(inMemory: Configuration.Core): Promise<boolean> {
-    const diskValue = await this.readDiskConfiguration();
-    return Bun.deepEquals(inMemory, diskValue);
-  }
-
   /**
    * A missing config.json is interpreted as empty configuration
+   *
+   * Part of "reading" will also be a migration attempt .. this is always a deterministic operation,
+   * but it's required in order to be able to continue working with an older JSON schema
+   *
+   * That's also the reason why this method returns both the `memoryObject` to be used,
+   * and a boolean indicating whether the `memoryObject` equals or differs from the diskObject
+   * (in 99% of cases, `memoryObjectMatchesDiskFile` will be `true`, but not a schema upgrade)
    */
-  private async readDiskConfiguration(): Promise<Configuration.Core> {
-    const diskFile = Bun.file(this.diskFilePath);
-    if (await diskFile.exists()) {
-      const json = await diskFile.json();
-      return Configuration.Core.parse(json);
-    }
-    return Configuration.Core.empty();
-  }
   private async readAndMigrateDiskConfiguration(): Promise<{ memoryObject: Configuration.Core; memoryObjectMatchesDiskFile: boolean }> {
     const diskFile = Bun.file(this.diskFilePath);
     if (await diskFile.exists()) {
@@ -136,19 +133,21 @@ export class ConfigurationRepository {
     const { release } = await this.mutex.acquire();
     try {
       let memoryObject: Configuration.Core;
+      let memoryObjectMatchesDiskFile: boolean;
       const diskFile = Bun.file(this.diskFilePath);
       if (operation === "save") {
         await diskFile.write(JSON.stringify(this.memoryObject));
         memoryObject = this.memoryObject;
+        memoryObjectMatchesDiskFile = true;
       } else if (operation === "discard") {
-        memoryObject = await this.readDiskConfiguration();
+        ({ memoryObject, memoryObjectMatchesDiskFile } = await this.readAndMigrateDiskConfiguration());
       } else {
         throw new Error(`Unknown operation: ${operation}`);
       }
       this.performUpdate({
         trigger: "disk_synchronization",
         memoryObject,
-        memoryObjectMatchesDiskFile: true,
+        memoryObjectMatchesDiskFile,
       });
     } finally {
       release();
