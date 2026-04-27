@@ -7,7 +7,7 @@ export class PipelineRepository {
 
   public async query(): Promise<Pipeline[]> {
     const { pipelines } = await this.configuration.read();
-    return pipelines.sort(Pipeline.sortNewToOld);
+    return pipelines.toSorted(Pipeline.sortAlphabetically);
   }
 
   public findById(id: string): Promise<Pipeline | undefined> {

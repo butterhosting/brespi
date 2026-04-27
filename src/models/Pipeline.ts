@@ -21,7 +21,7 @@ export namespace Pipeline {
     )
     .ensureTypeMatchesSchema();
 
-  export const sortNewToOld = ({ id: p1 }: Pipeline, { id: p2 }: Pipeline): number => {
-    return p2.localeCompare(p1); // uuid v7
+  export const sortAlphabetically = ({ name: n1 }: Pipeline, { name: n2 }: Pipeline): number => {
+    return n1.localeCompare(n2);
   };
 }

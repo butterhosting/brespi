@@ -40,18 +40,26 @@ describe("resource sorting", async () => {
     context.notificationDispatchServiceMock.cast(),
   );
 
+  it("queries pipelines alphabetically", async () => {
+    // given
+    const range = { min: 0, max: 49 } as const;
+    for (let i = range.min; i <= range.max; i++) {
+      await pipelineService.create({
+        name: `${i}`.padStart(3, "0"),
+        steps: [TestFixture.createStep(Step.Type.postgresql_backup)],
+      });
+    }
+    // when
+    const queriedResults = await pipelineService.query();
+    const sortedResults = queriedResults.toSorted(Pipeline.sortAlphabetically);
+    for (let i = range.min; i <= range.max; i++) {
+      // then
+      expect(Number(queriedResults[i].name)).toEqual(i);
+      expect(Number(sortedResults[i].name)).toEqual(i);
+    }
+  });
+
   const testCases: TestCase[] = [
-    {
-      type: "pipelines",
-      createFn: (index) =>
-        pipelineService.create({
-          name: `${index}`,
-          steps: [TestFixture.createStep(Step.Type.postgresql_backup)],
-        }),
-      queryFn: () => pipelineService.query(),
-      retrieveIndexFn: (resource) => Number((resource as Pipeline).name),
-      sortDirectlyFn: (r1, r2) => Pipeline.sortNewToOld(r1 as Pipeline, r2 as Pipeline),
-    },
     {
       type: "schedules",
       createFn: (index) =>
