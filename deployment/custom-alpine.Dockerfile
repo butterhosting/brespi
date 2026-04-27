@@ -2,7 +2,7 @@
 FROM oven/bun:alpine
 
 # Install runtime dependencies
-RUN apk update && apk add --no-cache bash su-exec
+RUN apk update && apk add --no-cache bash sqlite su-exec
 
 # Create the data directory and hand it to the bun user
 RUN mkdir -p /opt/brespi && chown bun:bun /opt/brespi

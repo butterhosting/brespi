@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 
 # Install runtime dependencies (bun ships as a static binary, but needs bash)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends bash gosu ca-certificates curl unzip \
+    && apt-get install -y --no-install-recommends bash sqlite3 gosu ca-certificates curl unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install bun (single static binary — copy to /usr/local/bin so all users can access it)

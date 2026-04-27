@@ -130,7 +130,7 @@ EOF
         cat >> "$tmpfile" <<'EOF'
 
 FROM oven/bun:alpine
-RUN apk update && apk add --no-cache bash
+RUN apk update && apk add --no-cache bash sqlite
 EOF
 
         if [ "$flag_postgresql" = true ]; then
