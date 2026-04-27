@@ -1,7 +1,6 @@
 import { FilesystemAdapter } from "@/adapters/filesystem/FilesystemAdapter";
 import { FilterCapability } from "@/capabilities/filter/FilterCapability";
 import { ManagedStorageCapability } from "@/capabilities/managedstorage/ManagedStorageCapability";
-import { Version } from "@/capabilities/managedstorage/Version";
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 import * as schema from "@/drizzle/schema";
 import { $action, $execution, $notificationPolicyMetadata, $scheduleMetadata } from "@/drizzle/schema";
@@ -15,57 +14,31 @@ import { ActionConverter } from "@/repositories/converters/ActionConverter";
 import { ExecutionConverter } from "@/repositories/converters/ExecutionConverter";
 import { NotificationPolicyMetadataConverter } from "@/repositories/converters/NotificationPolicyMetadataConverter";
 import { ScheduleMetadataConverter } from "@/repositories/converters/ScheduleMetadataConverter";
-import { spyOn, test } from "bun:test";
+import { MigrationManager } from "@/repositories/migrators/MigrationManager";
+import { test } from "bun:test";
 import { InferInsertModel } from "drizzle-orm";
 import { cp, mkdir } from "fs/promises";
 import { basename, dirname, join } from "path";
+import { TestEnvironment } from "../TestEnvironment.test";
 import { TestFixture } from "../TestFixture.test";
 
 test.skip("regression suite management", async () => {
-  const { rm } = await import("fs/promises");
-
-  // Clean start
-  await rm(join(RegressionSuite.Path.suite, "managed_storage_root_07"), { recursive: true, force: true });
-
-  // Listing 1: UTC
-  await rm(RegressionSuite.Path.suiteTmp, { recursive: true, force: true });
-  spyOn(Version, "now").mockReturnValue("2025-03-20T14:30:00.100+00:00");
-  await RegressionSuite.ManagedStorage.appendToStorageRoot("managed_storage_root_07", [
-    {
-      artifactNames: ["report_en.pdf", "report_fr.pdf"],
-      trail: [{ ...TestFixture.createStep(Step.Type.custom_script), runtime: { driver: "1.0.0" } }],
-    },
-  ]);
-
-  // Listing 2: America/New_York
-  await rm(RegressionSuite.Path.suiteTmp, { recursive: true, force: true });
-  spyOn(Version, "now").mockReturnValue("2025-07-10T09:15:00.200-04:00");
-  await RegressionSuite.ManagedStorage.appendToStorageRoot("managed_storage_root_07", [
-    {
-      artifactNames: ["transactions.csv"],
-      trail: [{ ...TestFixture.createStep(Step.Type.compression), runtime: { driver: "1.0.0" } }],
-    },
-  ]);
-
-  // Listing 3: Asia/Tokyo (latest instant)
-  await rm(RegressionSuite.Path.suiteTmp, { recursive: true, force: true });
-  spyOn(Version, "now").mockReturnValue("2025-11-25T22:45:00.300+09:00");
-  await RegressionSuite.ManagedStorage.appendToStorageRoot("managed_storage_root_07", [
-    {
-      artifactNames: ["inventory.xlsx", "shipments.csv", "audit_log.txt"],
-      trail: [{ ...TestFixture.createStep(Step.Type.encryption), runtime: { driver: "1.0.0" } }],
-    },
-  ]);
-
-  // Cleanup
-  await rm(RegressionSuite.Path.suiteTmp, { recursive: true, force: true });
+  // manual management of the suite, e.g.: `await Example.migrate()`
 });
 
 // @ts-ignore (unused variable which is never read)
 const Example = {
+  async migrate() {
+    await TestEnvironment.initialize();
+    const jsons = await RegressionSuite.Configuration.readJsons();
+    for (const { filename, json } of jsons) {
+      const migratedJson = await new MigrationManager().migrate(json);
+      await RegressionSuite.Configuration.writeJson(filename, migratedJson);
+    }
+  },
   async configuration() {
     await RegressionSuite.Configuration.writeJson("configuration_99.json", {
-      schema: 1,
+      schema: 2,
       pipelines: [
         {
           id: Bun.randomUUIDv7(),

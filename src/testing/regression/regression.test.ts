@@ -1,6 +1,7 @@
 import { FilesystemAdapter } from "@/adapters/filesystem/FilesystemAdapter";
 import { FilterCapability } from "@/capabilities/filter/FilterCapability";
 import { ManagedStorageCapability } from "@/capabilities/managedstorage/ManagedStorageCapability";
+import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 import { Sqlite } from "@/drizzle/sqlite";
 import { Env } from "@/Env";
 import { Configuration } from "@/models/Configuration";
@@ -8,7 +9,6 @@ import { Step } from "@/models/Step";
 import { afterAll, beforeEach, describe, expect, it } from "bun:test";
 import { rm } from "fs/promises";
 import { RegressionSuite } from "./RegressionSuite";
-import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 
 describe("regression", () => {
   let database: Sqlite;
@@ -24,10 +24,9 @@ describe("regression", () => {
 
   describe("configuration parsing", async () => {
     for (const { filename, json } of await RegressionSuite.Configuration.readJsons()) {
-      it(filename, () => {
-        // when
+      it(filename, async () => {
+        // (no errors)
         Configuration.Core.parse(json);
-        // then (no errors)
       });
     }
   });

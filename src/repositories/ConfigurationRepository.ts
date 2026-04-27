@@ -2,6 +2,7 @@ import { Env } from "@/Env";
 import { Mutex } from "@/helpers/Mutex";
 import { Logger } from "@/Logger";
 import { Configuration } from "@/models/Configuration";
+import { MigrationManager } from "./migrators/MigrationManager";
 
 type ChangeTrigger = "application" | "disk_synchronization";
 type ChangeListener = {
@@ -18,7 +19,10 @@ export class ConfigurationRepository {
   private memoryObject?: Configuration.Core;
   private memoryObjectMatchesDiskFile = true; // by definition, this will initially be true
 
-  public constructor(env: Env.Private) {
+  public constructor(
+    private readonly migrationManager: MigrationManager,
+    env: Env.Private,
+  ) {
     this.diskFilePath = env.O_BRESPI_CONFIGURATION;
   }
 
@@ -26,10 +30,11 @@ export class ConfigurationRepository {
     const { release } = await this.mutex.acquire();
     try {
       if (!this.memoryObject) {
+        const { memoryObject, memoryObjectMatchesDiskFile } = await this.readAndMigrateDiskConfiguration();
         this.performUpdate({
           trigger: "disk_synchronization",
-          memoryObject: await this.readDiskConfiguration(),
-          memoryObjectMatchesDiskFile: true,
+          memoryObject,
+          memoryObjectMatchesDiskFile,
         });
       }
     } finally {
@@ -97,13 +102,28 @@ export class ConfigurationRepository {
   /**
    * A missing config.json is interpreted as empty configuration
    */
-  private async readDiskConfiguration() {
+  private async readDiskConfiguration(): Promise<Configuration.Core> {
     const diskFile = Bun.file(this.diskFilePath);
     if (await diskFile.exists()) {
       const json = await diskFile.json();
       return Configuration.Core.parse(json);
     }
     return Configuration.Core.empty();
+  }
+  private async readAndMigrateDiskConfiguration(): Promise<{ memoryObject: Configuration.Core; memoryObjectMatchesDiskFile: boolean }> {
+    const diskFile = Bun.file(this.diskFilePath);
+    if (await diskFile.exists()) {
+      const diskJson = await diskFile.json();
+      const migratedJson = await this.migrationManager.migrate(diskJson);
+      return {
+        memoryObject: Configuration.Core.parse(migratedJson),
+        memoryObjectMatchesDiskFile: Bun.deepEquals(diskJson, migratedJson),
+      };
+    }
+    return {
+      memoryObject: Configuration.Core.empty(),
+      memoryObjectMatchesDiskFile: true,
+    };
   }
 
   /**

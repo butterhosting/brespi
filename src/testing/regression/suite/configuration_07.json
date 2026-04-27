@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "0f4c5118-3fe8-4dd9-a402-392e4515ab0c",
@@ -29,7 +29,10 @@
           "previousId": "43n7g1",
           "object": "step",
           "type": "mariadb_restore",
-          "connection": { "format": "url", "url": "${MARIA_STAGING_CONNECTION}" },
+          "connection": {
+            "format": "url",
+            "url": "${MARIA_STAGING_CONNECTION}"
+          },
           "toolkit": {
             "resolution": "automatic"
           },

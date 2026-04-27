@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "47aeeb72-fe25-43a9-8728-cce02ab30647",
@@ -10,7 +10,10 @@
           "id": "u8ha0p",
           "object": "step",
           "type": "postgresql_backup",
-          "connection": { "format": "url", "url": "${PG_CONNECTION_STRING}" },
+          "connection": {
+            "format": "url",
+            "url": "${PG_CONNECTION_STRING}"
+          },
           "toolkit": {
             "resolution": "automatic"
           },

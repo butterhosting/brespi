@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "bc54bcd1-b0b8-4828-b90e-6609578ddecc",
@@ -59,7 +59,10 @@
           "previousId": "g6v3sn",
           "object": "step",
           "type": "postgresql_restore",
-          "connection": { "format": "url", "url": "${PG_STAGING_CONNECTION}" },
+          "connection": {
+            "format": "url",
+            "url": "${PG_STAGING_CONNECTION}"
+          },
           "toolkit": {
             "resolution": "automatic"
           },

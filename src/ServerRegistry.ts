@@ -32,6 +32,7 @@ import { PipelineService } from "./services/PipelineService";
 import { RestrictedService } from "./services/RestrictedService";
 import { ScheduleService } from "./services/ScheduleService";
 import { StepService } from "./services/StepService";
+import { MigrationManager } from "./repositories/migrators/MigrationManager";
 
 export class ServerRegistry {
   public static async bootstrap(env: Env.Private, sqlite: Sqlite): Promise<ServerRegistry> {
@@ -75,7 +76,8 @@ export class ServerRegistry {
     const { eventBus } = this.register({ EventBus }, []);
 
     // Repositories
-    const { configurationRepository } = this.register({ ConfigurationRepository }, [env]);
+    const { migrationManager } = this.register({ MigrationManager }, []);
+    const { configurationRepository } = this.register({ ConfigurationRepository }, [migrationManager, env]);
     const { pipelineRepository } = this.register({ PipelineRepository }, [configurationRepository]);
     const { executionRepository } = this.register({ ExecutionRepository }, [sqlite]);
     const { scheduleRepository } = this.register({ ScheduleRepository }, [configurationRepository, sqlite]);

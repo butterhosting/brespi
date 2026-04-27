@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "5d8f566a-f00a-46ab-a666-d9533454c9b1",
@@ -10,7 +10,10 @@
           "id": "6ypcop",
           "object": "step",
           "type": "postgresql_backup",
-          "connection": { "format": "url", "url": "${PG_PROD_CONNECTION}" },
+          "connection": {
+            "format": "url",
+            "url": "${PG_PROD_CONNECTION}"
+          },
           "toolkit": {
             "resolution": "manual",
             "psql": "/usr/local/bin/psql",
@@ -61,7 +64,10 @@
           "id": "8awlc7",
           "object": "step",
           "type": "mariadb_backup",
-          "connection": { "format": "url", "url": "${MARIA_PROD_CONNECTION}" },
+          "connection": {
+            "format": "url",
+            "url": "${MARIA_PROD_CONNECTION}"
+          },
           "toolkit": {
             "resolution": "automatic"
           },

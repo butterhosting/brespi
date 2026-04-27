@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "d7b8ad7d-34f3-4bad-92b9-3c08c5643e44",
@@ -34,7 +34,8 @@
           "id": "divnn4",
           "previousId": "fu0lzo",
           "object": "step",
-          "type": "folder_flatten"
+          "type": "folder_flatten",
+          "level": -1
         },
         {
           "id": "f4orsn",

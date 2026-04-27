@@ -11,6 +11,7 @@ import { Artifact } from "@/models/Artifact";
 import { LogLevel } from "@/models/LogLevel";
 import { ConfigurationRepository } from "@/repositories/ConfigurationRepository";
 import { ExecutionRepository } from "@/repositories/ExecutionRepository";
+import { MigrationManager } from "@/repositories/migrators/MigrationManager";
 import { NotificationRepository } from "@/repositories/NotificationRepository";
 import { PipelineRepository } from "@/repositories/PipelineRepository";
 import { ScheduleRepository } from "@/repositories/ScheduleRepository";
@@ -99,7 +100,7 @@ export namespace TestEnvironment {
       O_BRESPI_STAGE: "development",
       O_BRESPI_TIMEZONE: "UTC",
       X_BRESPI_ROOT: join(unitTestRoot, "brespi"),
-      X_BRESPI_LOGGING: LogLevel.warn,
+      X_BRESPI_LOGGING: LogLevel.info,
       X_BRESPI_VERIFICATION_KEY:
         "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAalpLQu9Fkn/R3WylORAad6UB0XAOowFIjF2/FwAyjpc=\n-----END PUBLIC KEY-----",
       X_BRESPI_ENABLE_RESTRICTED_ENTPOINTS: "false",
@@ -130,7 +131,8 @@ export namespace TestEnvironment {
 
     // Reals
     const eventBus = new EventBus();
-    const configurationRepository = new ConfigurationRepository(env);
+    const migrationManager = new MigrationManager();
+    const configurationRepository = new ConfigurationRepository(migrationManager, env);
     await configurationRepository.initializeFromDisk();
     const pipelineRepository = new PipelineRepository(configurationRepository);
     const executionRepository = new ExecutionRepository(sqlite);

@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "pipelines": [
     {
       "id": "0c82b0b4-0b0d-441c-b5b4-9f4d933487f2",
@@ -10,7 +10,10 @@
           "id": "moc0hd",
           "object": "step",
           "type": "mariadb_backup",
-          "connection": { "format": "url", "url": "${MARIA_CONNECTION_STRING}" },
+          "connection": {
+            "format": "url",
+            "url": "${MARIA_CONNECTION_STRING}"
+          },
           "toolkit": {
             "resolution": "manual",
             "mariadb": "/usr/bin/mariadb",
