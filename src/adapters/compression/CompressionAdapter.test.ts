@@ -29,10 +29,24 @@ describe(CompressionAdapter.name, async () => {
     const [file] = await context.createArtifacts("f:data");
     await Bun.write(file.path, generateCompressibleText());
     // when
+    const level0 = await adapter.compress(file, fixture.compression(0)).then(readSize);
     const level1 = await adapter.compress(file, fixture.compression(1)).then(readSize);
     const level9 = await adapter.compress(file, fixture.compression(9)).then(readSize);
     // then
+    expect(level0).toBeGreaterThan(level1);
     expect(level1).toBeGreaterThan(level9);
+  });
+
+  it.each([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])("should round-trip a folder at compression level %d", async (level) => {
+    // given
+    const [artifact] = await context.createArtifacts("d:MyAmazingFolder");
+    // when
+    const compressed = await adapter.compress(artifact, fixture.compression(level));
+    const decompressed = await adapter.decompress(compressed, fixture.decompression());
+    // then
+    expect(compressed.name).toEqual(level === 0 ? "MyAmazingFolder.tar" : "MyAmazingFolder.tar.gz");
+    expect(decompressed.name).toEqual("MyAmazingFolder");
+    expect(decompressed.type).toEqual("directory");
   });
 
   const fixture = {

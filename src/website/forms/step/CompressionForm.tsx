@@ -13,7 +13,7 @@ const { summary, Field, Label, Description } = FormHelper.meta({
     },
     algorithm_targzip_level: {
       label: "Algorithm: compression level",
-      description: "Specifies the tar/gzip compression level.",
+      description: "Specifies the gzip compression level 0-9 (use 0 to create an uncompressed tar)",
     },
   },
 });

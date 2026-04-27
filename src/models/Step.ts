@@ -307,7 +307,7 @@ export namespace Step {
           type: z.literal(Type.compression),
           algorithm: z.object({
             implementation: z.literal("targzip"),
-            level: z.int().min(1).max(9),
+            level: z.int().min(0).max(9),
           }),
         } satisfies SubSchema<Step.Compression>),
 

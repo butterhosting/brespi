@@ -11,7 +11,8 @@ import { AdapterResult } from "../AdapterResult";
 
 export class CompressionAdapter extends AbstractAdapter {
   private readonly log = new Logger(__filename);
-  private readonly EXTENSION = ".tar.gz";
+  private readonly EXTENSION_TAR = ".tar";
+  private readonly EXTENSION_TAR_GZIP = ".tar.gz";
 
   public constructor(
     protected readonly env: Env.Private,
@@ -29,62 +30,74 @@ export class CompressionAdapter extends AbstractAdapter {
   }
 
   /**
-   * Compresses a file or directory into a .tar.gz archive with configurable compression level.
+   * Compresses a file or directory into an archive with configurable compression level.
+   * Level 0 produces a plain .tar (no gzip pass); levels 1-9 produce a .tar.gz.
    *
    * Commands to reproduce:
-   *   # Create uncompressed tar
+   *   # Level 0: plain tar, no gzip
    *   COPYFILE_DISABLE=1 tar -cf archive.tar -C /path/to/parent (filename|dirname)
    *
-   *   # Compress with explicit level (1-9)
+   *   # Levels 1-9: tar then gzip at the chosen level
+   *   COPYFILE_DISABLE=1 tar -cf archive.tar -C /path/to/parent (filename|dirname)
    *   gzip -9 -c archive.tar > archive.tar.gz
-   *
-   *   # Clean up intermediate file
    *   rm archive.tar
    */
   public async compress(artifact: Artifact, step: Step.Compression): Promise<Artifact> {
-    this.log.debug(`Preparing to compress; artifact=${artifact.name}, level=${step.algorithm.level}`);
+    const { level } = step.algorithm;
+    this.log.debug(`Preparing to compress; artifact=${artifact.name}, level=${level}`);
     const inputPath = artifact.path;
     const { outputId, outputPath } = this.generateArtifactDestination();
-    const intermediatePath = `${outputPath}.tar`;
+    const outputUncompressedTarPath = `${outputPath}.tar`;
     try {
       const env = {
         ...Bun.env,
         COPYFILE_DISABLE: "1", // Prevents macOS tar from creating ._* AppleDouble files
       };
-      // Create intermediate (uncompressed) tar
-      this.log.debug(`Creating intermediate tar; artifact=${artifact.name}`);
+
+      this.log.debug(`Creating uncompressed tar; artifact=${artifact.name}`);
       await this.runCommand({
-        cmd: ["tar", "-cf", intermediatePath, "-C", dirname(inputPath), basename(inputPath)],
-        env,
-      });
-      // Compress with explicit level (output to stdout, redirect to file via shell)
-      this.log.debug(`Compressing with gzip; artifact=${artifact.name}, level=${step.algorithm.level}`);
-      await this.runCommand({
-        cmd: ["sh", "-c", `gzip -${step.algorithm.level} -c "${intermediatePath}" > "${outputPath}"`],
+        cmd: ["tar", "-cf", outputUncompressedTarPath, "-C", dirname(inputPath), basename(inputPath)],
         env,
       });
 
-      this.log.info(`Successfully compressed; artifact=${artifact.name}, level=${step.algorithm.level}`);
+      let extension: string;
+      if (level === 0) {
+        extension = this.EXTENSION_TAR;
+        await rename(outputUncompressedTarPath, outputPath);
+      } else {
+        // Compress with explicit level (output to stdout, redirect to file via shell)
+        extension = this.EXTENSION_TAR_GZIP;
+        this.log.debug(`Compressing with gzip; artifact=${artifact.name}, level=${level}`);
+        await this.runCommand({
+          cmd: ["sh", "-c", `gzip -${level} -c "${outputUncompressedTarPath}" > "${outputPath}"`],
+          env,
+        });
+      }
+
+      this.log.info(`Successfully compressed; artifact=${artifact.name}, level=${level}`);
       return {
         id: outputId,
         type: "file",
         path: outputPath,
-        name: this.addExtension(artifact.name, this.EXTENSION),
+        name: this.addExtension(artifact.name, extension),
       };
     } catch (e) {
       throw this.mapError(e, ExecutionError.compression_failed);
     } finally {
-      await rm(intermediatePath, { recursive: true, force: true });
+      if (level > 0) {
+        await rm(outputUncompressedTarPath, { recursive: true, force: true });
+      }
     }
   }
 
   /**
-   * Decompresses a .tar.gz archive back to its original file or directory.
-   * The archive must contain exactly one top-level item (otherwise, we didn't create it)
+   * Decompresses a .tar or .tar.gz archive back to its original file or directory.
+   * The archive must contain exactly one top-level item (otherwise, we didn't create it).
+   * `tar -xf` auto-detects the format from magic bytes, so both extensions work.
    *
    * Commands to reproduce:
-   *   # Extract to temp directory
-   *   tar -xzf archive.tar.gz -C /temp/dir
+   *   # Extract to temp directory (auto-detects tar vs tar.gz)
+   *   tar -xf archive.(tar|tar.gz) -C /temp/dir
    *
    *   # Move the single extracted item to final destination
    *   mv /temp/dir/extracted-item /final/destination
@@ -97,7 +110,7 @@ export class CompressionAdapter extends AbstractAdapter {
     try {
       this.log.debug(`Extracting archive; artifact=${artifact.name}`);
       await this.runCommand({
-        cmd: ["tar", "-xzf", inputPath, "-C", tempPath],
+        cmd: ["tar", "-xf", inputPath, "-C", tempPath],
       });
 
       const singleChildPath = await this.findSingleChildPathWithinDirectory(tempPath);
@@ -105,7 +118,7 @@ export class CompressionAdapter extends AbstractAdapter {
       await rename(singleChildPath, outputPath);
 
       const stats = await this.requireFilesystemExistence(outputPath);
-      const name = this.stripExtension(artifact.name, this.EXTENSION);
+      const name = this.stripExtension(this.stripExtension(artifact.name, this.EXTENSION_TAR_GZIP), this.EXTENSION_TAR);
 
       this.log.info(`Successfully decompressed; artifact=${artifact.name}, outputType=${stats.type}`);
       return {
