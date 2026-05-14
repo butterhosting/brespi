@@ -118,6 +118,18 @@ verify_auth() {
     && assert_status "404" http://localhost:3000/api/restricted/purge -u kim:possible -X POST
 }
 
+# Proves that the entrypoint enrolled bun in the socket's owning group.
+# Forcing -u bun is essential — without it, docker exec would run as root,
+# which can always reach the socket and would pass even if the fix were broken.
+verify_docker() {
+    if ! docker compose -p "$active_project" -f "$active_compose" exec -T -u bun brespi docker ps >/dev/null 2>&1; then
+        printf "    FAIL  docker ps as bun (socket group enrollment broken?)\n"
+        return 1
+    fi
+    printf "    OK    docker ps as bun succeeded\n"
+    return 0
+}
+
 # ─── scenarios ───
 
 cd "$ROOT"
@@ -133,6 +145,9 @@ run_scenario "custom-alpine-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
 build_image "custom-ubuntu" --dockerfile "$SCRIPT_DIR/custom-ubuntu.Dockerfile"
 run_scenario "custom-ubuntu" "$SCRIPT_DIR/compose.yaml" verify_no_auth
 run_scenario "custom-ubuntu-auth" "$SCRIPT_DIR/compose-auth.yaml" verify_auth
+
+build_image "docker" --docker
+run_scenario "docker" "$SCRIPT_DIR/compose-docker.yaml" verify_docker
 
 # ─── summary ───
 

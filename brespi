@@ -10,7 +10,8 @@ usage() {
     printf "\nOptions for 'image create':\n"
     printf "  --postgresql              Include postgresql-client in the image\n"
     printf "  --mariadb                 Include mariadb-client in the image\n"
-    printf "  --dockerfile <path>       Use a custom Dockerfile (mutually exclusive with --postgresql/--mariadb)\n"
+    printf "  --docker                  Include docker-cli in the image\n"
+    printf "  --dockerfile <path>       Use a custom Dockerfile (mutually exclusive with --postgresql/--mariadb/--docker)\n"
     exit 1
 }
 
@@ -26,6 +27,7 @@ require_commands() {
 cmd_image_create() {
     flag_postgresql=false
     flag_mariadb=false
+    flag_docker=false
     custom_dockerfile=""
     stage="prod"
 
@@ -37,6 +39,10 @@ cmd_image_create() {
                 ;;
             --mariadb)
                 flag_mariadb=true
+                shift
+                ;;
+            --docker)
+                flag_docker=true
                 shift
                 ;;
             --dockerfile)
@@ -73,8 +79,8 @@ cmd_image_create() {
     fi
 
     # Validate mutual exclusivity
-    if [ -n "$custom_dockerfile" ] && { [ "$flag_postgresql" = true ] || [ "$flag_mariadb" = true ]; }; then
-        printf "Error: --dockerfile is mutually exclusive with --postgresql and --mariadb\n\n"
+    if [ -n "$custom_dockerfile" ] && { [ "$flag_postgresql" = true ] || [ "$flag_mariadb" = true ] || [ "$flag_docker" = true ]; }; then
+        printf "Error: --dockerfile is mutually exclusive with --postgresql, --mariadb and --docker\n\n"
         usage
     fi
 
@@ -139,6 +145,9 @@ EOF
         if [ "$flag_mariadb" = true ]; then
             printf "RUN apk add --no-cache mariadb-client\n" >> "$tmpfile"
         fi
+        if [ "$flag_docker" = true ]; then
+            printf "RUN apk add --no-cache docker-cli\n" >> "$tmpfile"
+        fi
 
         # Check if brespi_root is an absolute path
         case "$brespi_root" in
@@ -146,12 +155,47 @@ EOF
             *) is_absolute=false ;;
         esac
 
-        if [ "$is_absolute" = true ]; then
+        # We need an entrypoint (running as root briefly, then dropping to bun
+        # via su-exec) whenever there's privileged setup to do at container
+        # start: chown of an absolute brespi_root, or enrolling bun in the
+        # group that owns a mounted docker socket.
+        if [ "$is_absolute" = true ] || [ "$flag_docker" = true ]; then
+            needs_entrypoint=true
+        else
+            needs_entrypoint=false
+        fi
+
+        if [ "$needs_entrypoint" = true ]; then
+            entrypoint_path="./dist/entrypoint.sh"
+            {
+                printf '#!/bin/sh\nset -e\n'
+                if [ "$is_absolute" = true ]; then
+                    # Best-effort: a read-only bind mount inside brespi_root
+                    # (e.g. a mounted .htpasswd) will refuse chown, and that's
+                    # fine — the app handles read-only files at runtime.
+                    printf 'chown -R bun:bun %s || true\n' "$brespi_root"
+                fi
+                if [ "$flag_docker" = true ]; then
+                    cat <<'ENTRY_DOCKER'
+if [ -S /var/run/docker.sock ]; then
+    sock_gid=$(stat -c '%g' /var/run/docker.sock)
+    if ! getent group "$sock_gid" >/dev/null 2>&1; then
+        addgroup -g "$sock_gid" docker-host
+    fi
+    grp=$(getent group "$sock_gid" | cut -d: -f1)
+    adduser bun "$grp" >/dev/null 2>&1 || true
+fi
+ENTRY_DOCKER
+                fi
+                printf 'exec su-exec bun "$@"\n'
+            } > "$entrypoint_path"
+
             printf "RUN apk add --no-cache su-exec\n" >> "$tmpfile"
-            printf "RUN mkdir -p %s && chown bun:bun %s\n" "$brespi_root" "$brespi_root" >> "$tmpfile"
-            cat >> "$tmpfile" <<ENTRY_EOF
-RUN printf '#!/bin/sh\nchown -R bun:bun ${brespi_root}\nexec su-exec bun "\$@"\n' > /entrypoint.sh && chmod +x /entrypoint.sh
-ENTRY_EOF
+            if [ "$is_absolute" = true ]; then
+                printf "RUN mkdir -p %s && chown bun:bun %s\n" "$brespi_root" "$brespi_root" >> "$tmpfile"
+            fi
+            printf "COPY dist/entrypoint.sh /entrypoint.sh\n" >> "$tmpfile"
+            printf "RUN chmod +x /entrypoint.sh\n" >> "$tmpfile"
         fi
 
         cat >> "$tmpfile" <<'EOF'
@@ -159,7 +203,7 @@ WORKDIR /app
 COPY --from=builder --chown=bun:bun /app .
 EOF
 
-        if [ "$is_absolute" = true ]; then
+        if [ "$needs_entrypoint" = true ]; then
             printf 'ENTRYPOINT ["/entrypoint.sh"]\n' >> "$tmpfile"
         else
             printf "USER bun\n" >> "$tmpfile"
