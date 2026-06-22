@@ -8,7 +8,7 @@ env:
   NODE_MAJOR_VERSION: "24"
 
 jobs:
-  main:
+  ci:
     name: "CI Pipeline"
     runs-on: ubuntu-latest
     steps:

@@ -9,8 +9,8 @@ export function ErrorDump({ error }: Props) {
   const { problem, details } = ProblemDetails.isInstance(error)
     ? error
     : typeof error?.message === "string"
-      ? ClientError.unknown({ message: error.message }).json()
-      : ClientError.unknown().json();
+      ? ClientError.unknown({ message: error.message }).problemDetails()
+      : ClientError.unknown().problemDetails();
   return (
     <div className="inline-block text-left text-c-error">
       <div className="inline-flex gap-2">

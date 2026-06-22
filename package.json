@@ -36,6 +36,7 @@
     "react-router": "^7.13.1",
     "tailwindcss": "^4.2.1",
     "yesttp": "^1.0.3",
+    "yexception": "^1.0.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

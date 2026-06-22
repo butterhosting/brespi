@@ -1,14 +1,14 @@
-import { Exception } from "./exception/Exception";
+import { Yexception } from "yexception";
 
 export class ScheduleError {
-  public static readonly _NAME_ = "ScheduleError";
+  public static readonly NAME = "ScheduleError";
 
-  public static readonly not_found: Exception.Fn<{ id: string }>;
-  public static readonly already_exists: Exception.Fn<{ id: string }>;
-  public static readonly invalid_cron_expression: Exception.Fn;
-  public static readonly pipeline_not_found: Exception.Fn;
+  public static readonly not_found = Yexception.field<{ id: string }>();
+  public static readonly already_exists = Yexception.field<{ id: string }>();
+  public static readonly invalid_cron_expression = Yexception.field();
+  public static readonly pipeline_not_found = Yexception.field();
 
   static {
-    Exception.initializeFields(this);
+    Yexception.initialize(this);
   }
 }

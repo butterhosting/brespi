@@ -1,6 +1,5 @@
 import { AdapterService } from "@/adapters/AdapterService";
 import { Env } from "@/Env";
-import { Exception } from "@/errors/exception/Exception";
 import { ExecutionError } from "@/errors/ExecutionError";
 import { PipelineError } from "@/errors/PipelineError";
 import { ServerError } from "@/errors/ServerError";
@@ -23,6 +22,7 @@ import { ServerMessage } from "@/socket/ServerMessage";
 import { Socket } from "@/socket/Socket";
 import { Temporal } from "@js-temporal/polyfill";
 import { copyFile, rm } from "fs/promises";
+import { Yexception } from "yexception";
 import z from "zod/v4";
 
 export class ExecutionService {
@@ -347,7 +347,7 @@ export class ExecutionService {
   }
 
   private formatAdapterError(e: unknown): string {
-    if (Exception.isInstance(e)) {
+    if (Yexception.isInstance(e)) {
       let details: string = "";
       if (e.details) {
         if (e.details.cause) {

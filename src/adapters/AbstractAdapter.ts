@@ -1,11 +1,11 @@
 import { PropertyResolver } from "@/capabilities/propertyresolution/PropertyResolver";
 import { Env } from "@/Env";
-import { Exception } from "@/errors/exception/Exception";
 import { ExecutionError } from "@/errors/ExecutionError";
 import { CommandRunner } from "@/helpers/CommandRunner";
 import { TempDestination } from "@/helpers/TempDestination";
 import { Artifact } from "@/models/Artifact";
 import { mkdir, stat } from "fs/promises";
+import { Yexception } from "yexception";
 
 export abstract class AbstractAdapter {
   protected constructor(
@@ -96,8 +96,8 @@ export abstract class AbstractAdapter {
     }
   }
 
-  protected mapError(e: unknown, custom: (opt: { cause: string }) => Exception): Exception {
-    if (Exception.isInstance(e)) {
+  protected mapError(e: unknown, custom: (opt: { cause: string }) => Yexception): Yexception {
+    if (Yexception.isInstance(e)) {
       return e;
     }
     return custom({

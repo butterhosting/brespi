@@ -1,11 +1,11 @@
-import { Exception } from "./exception/Exception";
+import { Yexception } from "yexception";
 
 export class NotificationError {
-  public static readonly _NAME_ = "NotificationError";
-  public static readonly policy_not_found: Exception.Fn<{ id: string }>;
-  public static readonly policy_already_exists: Exception.Fn<{ id: string }>;
+  public static readonly NAME = "NotificationError";
+  public static readonly policy_not_found = Yexception.field<{ id: string }>();
+  public static readonly policy_already_exists = Yexception.field<{ id: string }>();
 
   static {
-    Exception.initializeFields(this);
+    Yexception.initialize(this);
   }
 }

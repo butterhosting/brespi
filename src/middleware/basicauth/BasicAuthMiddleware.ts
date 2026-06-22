@@ -40,7 +40,7 @@ export class BasicAuthMiddleware implements MiddlewareHandler {
     if (this.enabled) {
       const { accessGranted } = await this.authenticate(request.headers);
       if (!accessGranted) {
-        return Response.json(ServerError.unauthorized().json(), {
+        return Response.json(ServerError.unauthorized().problemDetails(), {
           status: 401,
           headers: { "WWW-Authenticate": "Basic" },
         });

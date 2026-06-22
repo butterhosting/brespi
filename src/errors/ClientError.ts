@@ -1,10 +1,10 @@
-import { Exception } from "./exception/Exception";
+import { Yexception } from "yexception";
 
 export class ClientError {
-  public static readonly _NAME_ = "ClientError";
-  public static readonly unknown: Exception.Fn;
+  public static readonly NAME = "ClientError";
+  public static readonly unknown = Yexception.field();
 
   static {
-    Exception.initializeFields(this);
+    Yexception.initialize(this);
   }
 }
