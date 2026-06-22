@@ -16,7 +16,7 @@ import { Skeleton } from "../comps/Skeleton";
 import { Spinner } from "../comps/Spinner";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useRegistry } from "../hooks/useRegistry";
-import { useYesQuery } from "../hooks/useYesQuery";
+import { useYesQuery } from "react-yesquery";
 
 export function pipelinesPage() {
   useDocumentTitle("Pipelines | Brespi");

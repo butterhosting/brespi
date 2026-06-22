@@ -3,7 +3,7 @@ import { Execution } from "@/models/Execution";
 import { Outcome } from "@/models/Outcome";
 import { ProblemDetails } from "@/models/ProblemDetails";
 import { usePagination } from "@/website/hooks/usePagination";
-import { useYesQuery } from "@/website/hooks/useYesQuery";
+import { useYesQuery } from "react-yesquery";
 import clsx from "clsx";
 import { useCallback } from "react";
 import { ErrorDump } from "../ErrorDump";

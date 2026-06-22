@@ -17,6 +17,7 @@
         "react-dom": "^19",
         "react-hook-form": "^7.71.2",
         "react-router": "^7.13.1",
+        "react-yesquery": "^1.0.0",
         "tailwindcss": "^4.2.1",
         "yesttp": "^1.0.3",
         "yexception": "^1.0.0",
@@ -540,6 +541,8 @@
     "react-hook-form": ["react-hook-form@7.71.2", "", { "peerDependencies": { "react": "^16.8.0 || ^17 || ^18 || ^19" } }, "sha512-1CHvcDYzuRUNOflt4MOq3ZM46AronNJtQ1S7tnX6YN4y72qhgiUItpacZUAQ0TyWYci3yz1X+rXaSxiuEm86PA=="],
 
     "react-router": ["react-router@7.13.1", "", { "dependencies": { "cookie": "^1.0.1", "set-cookie-parser": "^2.6.0" }, "peerDependencies": { "react": ">=18", "react-dom": ">=18" }, "optionalPeers": ["react-dom"] }, "sha512-td+xP4X2/6BJvZoX6xw++A2DdEi++YypA69bJUV5oVvqf6/9/9nNlD70YO1e9d3MyamJEBQFEzk6mbfDYbqrSA=="],
+
+    "react-yesquery": ["react-yesquery@1.0.0", "", { "peerDependencies": { "@types/react": "^19" } }, "sha512-8xtPwthH0Qz+PBmjB480KOhe+qPjLAeFDX7ES0t0C7o+TpDZBf2pulCaWezIeDb7T1c3bsHYGJaxtKAqy4x9YA=="],
 
     "resolve-pkg-maps": ["resolve-pkg-maps@1.0.0", "", {}, "sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw=="],
 

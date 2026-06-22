@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { ConfigurationClient } from "../clients/ConfigurationClient";
 import { SocketClient } from "../clients/SocketClient";
 import { useRegistry } from "./useRegistry";
-import { useYesQuery } from "./useYesQuery";
+import { useYesQuery } from "react-yesquery";
 
 type Result = {
   synchronized: boolean;

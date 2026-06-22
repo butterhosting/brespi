@@ -34,6 +34,7 @@
     "react-dom": "^19",
     "react-hook-form": "^7.71.2",
     "react-router": "^7.13.1",
+    "react-yesquery": "^1.0.0",
     "tailwindcss": "^4.2.1",
     "yesttp": "^1.0.3",
     "yexception": "^1.0.0",

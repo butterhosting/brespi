@@ -16,7 +16,7 @@ import { Toggle } from "../comps/Toggle";
 import { ScheduleEditor } from "../forms/schedule/ScheduleEditor";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useRegistry } from "../hooks/useRegistry";
-import { useYesQuery } from "../hooks/useYesQuery";
+import { useYesQuery } from "react-yesquery";
 
 export function schedulesPage() {
   useDocumentTitle("Schedules | Brespi");

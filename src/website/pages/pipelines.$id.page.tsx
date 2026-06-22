@@ -37,7 +37,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useFullScreen } from "../hooks/useFullScreen";
 import { useRegistry } from "../hooks/useRegistry";
 import { useStateRef } from "../hooks/useStateRef";
-import { useYesQuery } from "../hooks/useYesQuery";
+import { useYesQuery } from "react-yesquery";
 
 type Form = {
   interactivity: Interactivity;
